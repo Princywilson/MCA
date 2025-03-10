@@ -17,10 +17,7 @@ INSERT INTO STAFF (STAFFNO, NAME, DOB, GENDER, DOJ, DESIGNATION, BASIC_PAY, DEPT
 (107, 'David Miller', '1987-04-05', 'M', '2013-08-17', 'HR Assistant', 55000.00, 2),
 (108, 'Sarah Taylor', '1986-12-10', 'F', '2011-05-08', 'Accountant', 68000.00, 3),
 (109, 'James Wilson', '1991-08-22', 'M', '2017-03-14', 'Marketing Coordinator', 60000.00, 4),
-(110, 'Olivia Garcia', '1984-06-30', 'F', '2010-10-25', 'Operations Analyst', 67000.00, 5),
-(111, 'Daniel Martinez', '1989-01-17', 'M', '2014-07-12', 'System Administrator', 78000.00, 1),
-(112, 'Emily Anderson', '1993-10-05', 'F', '2018-02-19', 'HR Specialist', 62000.00, 2),
-(113, 'William Thomas', '1981-09-28', 'M', '2009-12-03', 'Finance Manager', 88000.00, 3);
+(110, 'Olivia Garcia', '1984-06-30', 'F', '2010-10-25', 'Operations Analyst', 67000.00, 5);
 
 -- Insert data into SKILL table
 INSERT INTO SKILL (SKILL_CODE, DESCRIPTION, CHARGE_OUTRATE) VALUES
@@ -46,10 +43,7 @@ INSERT INTO STAFF_SKILL (STAFFNO, SKILL_CODE) VALUES
 (107, 204),
 (108, 202), (108, 205),
 (109, 206),
-(110, 204), (110, 207),
-(111, 201), (111, 207), (111, 208), (111, 210),
-(112, 204), (112, 206),
-(113, 202), (113, 204), (113, 205);
+(110, 204), (110, 207);
 
 -- Insert data into PROJECT table
 INSERT INTO PROJECT (PROJECTNO, PNAME, START_DATE, END_DATE, BUDGET, PROJECT_MANAGER_STAFFNO) VALUES
@@ -74,10 +68,6 @@ INSERT INTO WORKS (STAFFNO, PROJECTNO, DATE_WORKED_ON, IN_TIME, OUT_TIME) VALUES
 (108, 303, '2023-03-15', '09:00:00', '18:00:00'),
 (109, 304, '2023-03-15', '09:30:00', '17:30:00'),
 (110, 305, '2023-03-15', '08:00:00', '16:00:00'),
-(111, 301, '2023-03-15', '09:00:00', '17:00:00'),
-(111, 306, '2023-03-15', '17:30:00', '20:00:00'),
-(112, 302, '2023-03-15', '08:30:00', '16:30:00'),
-(113, 303, '2023-03-15', '09:00:00', '18:00:00'),
 (101, 301, '2023-03-16', '09:00:00', '17:00:00'),
 (102, 302, '2023-03-16', '08:30:00', '16:30:00'),
 (101, 306, '2023-03-16', '17:30:00', '19:30:00'),
