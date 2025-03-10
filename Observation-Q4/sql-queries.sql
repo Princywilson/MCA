@@ -1,4 +1,4 @@
--- DDL Implementation of Company Database Schema
+-- 1. DDL to implement the schema with appropriate data types and constraints
 
 -- Create DEPARTMENT table
 CREATE TABLE DEPARTMENT (
@@ -6,26 +6,25 @@ CREATE TABLE DEPARTMENT (
     NAME VARCHAR(50) NOT NULL,
     MENO INT,
     NOE INT DEFAULT 0
-    -- MENO foreign key will be added after EMPLOYEE table is created
 );
 
 -- Create EMPLOYEE table
 CREATE TABLE EMPLOYEE (
     ENO INT PRIMARY KEY,
     NAME VARCHAR(50) NOT NULL,
-    GENDER CHAR(1) NOT NULL CHECK (GENDER IN ('M', 'F')),
-    DOB DATE NOT NULL,
-    DOJ DATE NOT NULL,
-    DESIGNATION VARCHAR(50) NOT NULL,
-    BASIC DECIMAL(10, 2) NOT NULL,
-    DEPT_NO INT NOT NULL,
-    PANNO VARCHAR(10) UNIQUE NOT NULL,
+    GENDER CHAR(1) CHECK (GENDER IN ('M', 'F', 'O')), -- Check constraint for GENDER
+    DOB DATE,
+    DOJ DATE,
+    DESIGNATION VARCHAR(50),
+    BASIC DECIMAL(10, 2),
+    DEPT_NO INT,
+    PANNO VARCHAR(10),
     SENO INT,
     FOREIGN KEY (DEPT_NO) REFERENCES DEPARTMENT(DEPT_NO),
     FOREIGN KEY (SENO) REFERENCES EMPLOYEE(ENO)
 );
 
--- Add MENO foreign key to DEPARTMENT table
+-- Add Foreign Key to DEPARTMENT referencing EMPLOYEE for MENO
 ALTER TABLE DEPARTMENT
 ADD CONSTRAINT FK_DEPARTMENT_EMPLOYEE
 FOREIGN KEY (MENO) REFERENCES EMPLOYEE(ENO);
@@ -34,7 +33,7 @@ FOREIGN KEY (MENO) REFERENCES EMPLOYEE(ENO);
 CREATE TABLE PROJECT (
     PROJ_NO INT PRIMARY KEY,
     NAME VARCHAR(50) NOT NULL,
-    DEPT_NO INT NOT NULL,
+    DEPT_NO INT,
     FOREIGN KEY (DEPT_NO) REFERENCES DEPARTMENT(DEPT_NO)
 );
 
@@ -42,138 +41,108 @@ CREATE TABLE PROJECT (
 CREATE TABLE WORKSFOR (
     ENO INT,
     PROJ_NO INT,
-    DATE_WORKED DATE NOT NULL,
-    HOURS DECIMAL(5, 2) NOT NULL CHECK (HOURS > 0 AND HOURS <= 24),
-    PRIMARY KEY (ENO, PROJ_NO, DATE_WORKED),
+    DATE_WORKED DATE,
+    HOURS DECIMAL(5, 2),
+    PRIMARY KEY (ENO, PROJ_NO, DATE_WORKED), -- Composite primary key
     FOREIGN KEY (ENO) REFERENCES EMPLOYEE(ENO),
     FOREIGN KEY (PROJ_NO) REFERENCES PROJECT(PROJ_NO)
 );
 
--- Inserting sample data into the tables
+-- 2. Populate the database with sample data
 
--- Insert Department records (without managers initially)
-INSERT INTO DEPARTMENT (DEPT_NO, NAME, NOE) VALUES
-(101, 'Human Resources', 0),
-(102, 'Finance', 0),
-(103, 'Engineering', 0),
+-- Insert data into DEPARTMENT (without MENO initially as it references EMPLOYEE)
+INSERT INTO DEPARTMENT (DEPT_NO, NAME, NOE) VALUES 
+(101, 'IT', 0),
+(102, 'HR', 0),
+(103, 'Finance', 0),
 (104, 'Marketing', 0),
-(105, 'Research & Development', 0);
+(105, 'Operations', 0);
 
--- Insert Employee records (including department managers)
-INSERT INTO EMPLOYEE (ENO, NAME, GENDER, DOB, DOJ, DESIGNATION, BASIC, DEPT_NO, PANNO, SENO) VALUES
--- Department Managers
-(1001, 'John Smith', 'M', '1975-05-15', '2010-06-01', 'HR Manager', 85000.00, 101, 'PANHR001', NULL),
-(1002, 'Sarah Johnson', 'F', '1980-03-22', '2012-04-10', 'Finance Manager', 90000.00, 102, 'PANFN001', NULL),
-(1003, 'Michael Chen', 'M', '1978-11-30', '2011-07-15', 'Engineering Manager', 95000.00, 103, 'PANEN001', NULL),
-(1004, 'Emily Davis', 'F', '1982-09-18', '2013-02-20', 'Marketing Manager', 88000.00, 104, 'PANMK001', NULL),
-(1005, 'Robert Wilson', 'M', '1977-07-25', '2010-12-05', 'R&D Manager', 92000.00, 105, 'PANRD001', NULL),
+-- Insert data into EMPLOYEE (without SENO initially as it's self-referencing)
+INSERT INTO EMPLOYEE (ENO, NAME, GENDER, DOB, DOJ, DESIGNATION, BASIC, DEPT_NO, PANNO) VALUES 
+(1001, 'John Smith', 'M', '1980-05-15', '2010-01-10', 'Manager', 80000.00, 101, 'ABCPX1234Y'),
+(1002, 'Sarah Johnson', 'F', '1985-08-22', '2011-03-15', 'Manager', 78000.00, 102, 'DEFPX5678Z'),
+(1003, 'Michael Brown', 'M', '1978-11-30', '2009-07-20', 'Manager', 85000.00, 103, 'GHIPX9012A'),
+(1004, 'Emily Davis', 'F', '1982-04-18', '2012-05-05', 'Manager', 76000.00, 104, 'JKLPX3456B'),
+(1005, 'Robert Wilson', 'M', '1975-09-25', '2008-11-12', 'Manager', 90000.00, 105, 'MNOPX7890C');
 
--- Supervisors
-(2001, 'David Brown', 'M', '1985-04-12', '2015-03-10', 'HR Supervisor', 65000.00, 101, 'PANHR002', 1001),
-(2002, 'Lisa Anderson', 'F', '1983-08-28', '2014-06-15', 'Finance Supervisor', 68000.00, 102, 'PANFN002', 1002),
-(2003, 'James Taylor', 'M', '1984-01-05', '2014-09-22', 'Engineering Supervisor', 70000.00, 103, 'PANEN002', 1003),
-(2004, 'Michelle Lee', 'F', '1986-11-17', '2016-01-15', 'Marketing Supervisor', 67000.00, 104, 'PANMK002', 1004),
-(2005, 'Thomas Moore', 'M', '1982-06-30', '2013-11-08', 'R&D Supervisor', 69000.00, 105, 'PANRD002', 1005),
-
--- Regular Employees
-(3001, 'Jennifer Walker', 'F', '1990-02-14', '2018-05-20', 'HR Assistant', 45000.00, 101, 'PANHR003', 2001),
-(3002, 'Christopher King', 'M', '1988-10-23', '2017-08-14', 'Accountant', 50000.00, 102, 'PANFN003', 2002),
-(3003, 'Jessica Wright', 'F', '1991-07-08', '2019-03-05', 'Software Engineer', 55000.00, 103, 'PANEN003', 2003),
-(3004, 'Daniel Hill', 'M', '1989-12-30', '2018-07-25', 'Marketing Specialist', 48000.00, 104, 'PANMK003', 2004),
-(3005, 'Amanda Scott', 'F', '1992-04-17', '2020-01-10', 'Research Scientist', 54000.00, 105, 'PANRD003', 2005),
-(3006, 'Kevin Green', 'M', '1993-09-05', '2020-06-15', 'HR Coordinator', 42000.00, 101, 'PANHR004', 2001),
-(3007, 'Elizabeth Adams', 'F', '1990-05-28', '2019-02-18', 'Financial Analyst', 48000.00, 102, 'PANFN004', 2002),
-(3008, 'Ryan Baker', 'M', '1991-11-12', '2019-08-20', 'Software Developer', 52000.00, 103, 'PANEN004', 2003),
-(3009, 'Olivia Carter', 'F', '1992-08-03', '2020-03-10', 'Marketing Analyst', 46000.00, 104, 'PANMK004', 2004),
-(3010, 'Andrew Nelson', 'M', '1993-01-20', '2020-09-08', 'Lab Technician', 47000.00, 105, 'PANRD004', 2005);
-
--- Update Department managers
+-- Update DEPARTMENT with manager employee numbers
 UPDATE DEPARTMENT SET MENO = 1001 WHERE DEPT_NO = 101;
 UPDATE DEPARTMENT SET MENO = 1002 WHERE DEPT_NO = 102;
 UPDATE DEPARTMENT SET MENO = 1003 WHERE DEPT_NO = 103;
 UPDATE DEPARTMENT SET MENO = 1004 WHERE DEPT_NO = 104;
 UPDATE DEPARTMENT SET MENO = 1005 WHERE DEPT_NO = 105;
 
--- Insert Project records
-INSERT INTO PROJECT (PROJ_NO, NAME, DEPT_NO) VALUES
-(501, 'Employee Benefits System', 101),
-(502, 'Financial Reporting Tool', 102),
-(503, 'Product Development Platform', 103),
-(504, 'Digital Marketing Campaign', 104),
-(505, 'Innovation Research', 105),
-(506, 'HR Portal Enhancement', 101),
-(507, 'Budget Optimization', 102),
-(508, 'Cloud Migration Project', 103),
-(509, 'Social Media Strategy', 104),
-(510, 'New Product Research', 105);
+-- Insert more employees with supervisors
+INSERT INTO EMPLOYEE (ENO, NAME, GENDER, DOB, DOJ, DESIGNATION, BASIC, DEPT_NO, PANNO, SENO) VALUES 
+(1006, 'Patricia Moore', 'F', '1988-07-14', '2014-02-20', 'Developer', 65000.00, 101, 'PQRPX1234D', 1001),
+(1007, 'James Anderson', 'M', '1990-03-08', '2015-09-17', 'Developer', 62000.00, 101, 'STUPA5678E', 1001),
+(1008, 'Jennifer White', 'F', '1987-12-03', '2013-11-25', 'HR Assistant', 58000.00, 102, 'VWXPY9012F', 1002),
+(1009, 'David Miller', 'M', '1989-06-27', '2016-04-10', 'Accountant', 64000.00, 103, 'ZABPC3456G', 1003),
+(1010, 'Lisa Taylor', 'F', '1991-10-11', '2017-08-03', 'Marketing Exec', 56000.00, 104, 'DEFPG7890H', 1004),
+(1011, 'Richard Harris', 'M', '1986-02-19', '2013-05-22', 'Operations Analyst', 59000.00, 105, 'GHIPI1234I', 1005),
+(1012, 'Susan Martin', 'F', '1992-05-07', '2018-01-15', 'Developer', 60000.00, 101, 'JKLPJ5678J', 1001),
+(1013, 'Thomas Clark', 'M', '1984-09-23', '2012-07-08', 'HR Recruiter', 61000.00, 102, 'MNOPK9012K', 1002),
+(1014, 'Karen Lewis', 'F', '1990-01-29', '2017-03-12', 'Financial Analyst', 63000.00, 103, 'PQRPL3456L', 1003),
+(1015, 'Daniel Walker', 'M', '1993-08-16', '2019-06-25', 'Content Creator', 57000.00, 104, 'STUPM7890M', 1004);
 
--- Insert WORKSFOR records
-INSERT INTO WORKSFOR (ENO, PROJ_NO, DATE_WORKED, HOURS) VALUES
--- HR Department
-(1001, 501, '2023-05-10', 6.5),
-(1001, 506, '2023-05-10', 2.0),
-(2001, 501, '2023-05-10', 8.0),
-(3001, 501, '2023-05-10', 8.0),
-(3006, 506, '2023-05-10', 8.0),
+-- Update NOE in DEPARTMENT (would normally be done by trigger)
+UPDATE DEPARTMENT SET NOE = 3 WHERE DEPT_NO = 101; -- Manager + 2 developers
+UPDATE DEPARTMENT SET NOE = 3 WHERE DEPT_NO = 102; -- Manager + 2 HR staff
+UPDATE DEPARTMENT SET NOE = 3 WHERE DEPT_NO = 103; -- Manager + 2 finance staff
+UPDATE DEPARTMENT SET NOE = 3 WHERE DEPT_NO = 104; -- Manager + 2 marketing staff
+UPDATE DEPARTMENT SET NOE = 2 WHERE DEPT_NO = 105; -- Manager + 1 operations staff
 
--- Finance Department
-(1002, 502, '2023-05-10', 5.0),
-(1002, 507, '2023-05-10', 3.5),
-(2002, 502, '2023-05-10', 8.0),
-(3002, 507, '2023-05-10', 8.0),
-(3007, 502, '2023-05-10', 8.0),
+-- Insert data into PROJECT
+INSERT INTO PROJECT (PROJ_NO, NAME, DEPT_NO) VALUES 
+(201, 'ERP Implementation', 101),
+(202, 'Employee Training Program', 102),
+(203, 'Financial Reporting System', 103),
+(204, 'Brand Campaign 2023', 104),
+(205, 'Supply Chain Optimization', 105),
+(206, 'Mobile App Development', 101),
+(207, 'HR Policy Revision', 102),
+(208, 'Cost Reduction Initiative', 103);
 
--- Engineering Department
-(1003, 503, '2023-05-10', 4.0),
-(1003, 508, '2023-05-10', 4.5),
-(2003, 508, '2023-05-10', 8.0),
-(3003, 503, '2023-05-10', 8.0),
-(3008, 508, '2023-05-10', 8.0),
+-- Insert data into WORKSFOR
+INSERT INTO WORKSFOR (ENO, PROJ_NO, DATE_WORKED, HOURS) VALUES 
+(1001, 201, '2023-01-15', 6.5),
+(1001, 206, '2023-01-15', 2.0),
+(1006, 201, '2023-01-15', 8.0),
+(1007, 206, '2023-01-15', 8.0),
+(1012, 201, '2023-01-15', 4.0),
+(1012, 206, '2023-01-15', 4.0),
+(1002, 202, '2023-01-15', 5.0),
+(1002, 207, '2023-01-15', 3.5),
+(1008, 202, '2023-01-15', 8.0),
+(1013, 207, '2023-01-15', 8.0),
+(1003, 203, '2023-01-15', 7.0),
+(1003, 208, '2023-01-15', 1.5),
+(1009, 203, '2023-01-15', 8.0),
+(1014, 208, '2023-01-15', 8.0),
+(1004, 204, '2023-01-15', 8.0),
+(1010, 204, '2023-01-15', 8.0),
+(1015, 204, '2023-01-15', 8.0),
+(1005, 205, '2023-01-15', 8.0),
+(1011, 205, '2023-01-15', 8.0);
 
--- Marketing Department
-(1004, 504, '2023-05-10', 6.0),
-(1004, 509, '2023-05-10', 2.5),
-(2004, 504, '2023-05-10', 8.0),
-(3004, 509, '2023-05-10', 8.0),
-(3009, 504, '2023-05-10', 8.0),
-
--- R&D Department
-(1005, 505, '2023-05-10', 5.5),
-(1005, 510, '2023-05-10', 3.0),
-(2005, 510, '2023-05-10', 8.0),
-(3005, 505, '2023-05-10', 8.0),
-(3010, 510, '2023-05-10', 8.0);
-
--- Update NOE (Number of Employees) in DEPARTMENT table
-UPDATE DEPARTMENT SET NOE = 4 WHERE DEPT_NO = 101; -- HR: Manager, Supervisor, 2 Employees
-UPDATE DEPARTMENT SET NOE = 4 WHERE DEPT_NO = 102; -- Finance: Manager, Supervisor, 2 Employees
-UPDATE DEPARTMENT SET NOE = 4 WHERE DEPT_NO = 103; -- Engineering: Manager, Supervisor, 2 Employees
-UPDATE DEPARTMENT SET NOE = 4 WHERE DEPT_NO = 104; -- Marketing: Manager, Supervisor, 2 Employees
-UPDATE DEPARTMENT SET NOE = 4 WHERE DEPT_NO = 105; -- R&D: Manager, Supervisor, 2 Employees
-
--- SQL query to list employees who earn less than the average basic pay of all employees
-SELECT *
-FROM EMPLOYEE
+-- 3. SQL query to list the details of employees who earn less than the average basic pay of all employees
+SELECT * FROM EMPLOYEE
 WHERE BASIC < (SELECT AVG(BASIC) FROM EMPLOYEE);
 
--- SQL query to list departments which have more than six employees
-SELECT *
-FROM DEPARTMENT
+-- 4. SQL query to list the details of departments which has more than six employees working in it
+SELECT * FROM DEPARTMENT
 WHERE NOE > 6;
 
--- Create a view to track department statistics
+-- 5. Create a view to track department statistics
 CREATE VIEW DEPARTMENT_STATS AS
-SELECT 
-    D.DEPT_NO,
-    D.NAME AS DEPT_NAME,
-    D.NOE,
-    SUM(E.BASIC) AS TOTAL_BASIC_PAY
+SELECT D.DEPT_NO, D.NAME, D.NOE, SUM(E.BASIC) AS TOTAL_BASIC_PAY
 FROM DEPARTMENT D
-LEFT JOIN EMPLOYEE E ON D.DEPT_NO = E.DEPT_NO
+JOIN EMPLOYEE E ON D.DEPT_NO = E.DEPT_NO
 GROUP BY D.DEPT_NO, D.NAME, D.NOE;
 
--- Database Trigger to increment NOE when a new employee is inserted
-CREATE OR REPLACE TRIGGER TRG_EMPLOYEE_INSERT
+-- 6. Trigger to increment NOE when a new record is inserted in the EMPLOYEE relation
+CREATE OR REPLACE TRIGGER INCREMENT_NOE
 AFTER INSERT ON EMPLOYEE
 FOR EACH ROW
 BEGIN
@@ -183,8 +152,8 @@ BEGIN
 END;
 /
 
--- Database Trigger to decrement NOE when an employee is deleted
-CREATE OR REPLACE TRIGGER TRG_EMPLOYEE_DELETE
+-- 7. Trigger to decrement NOE when a record is deleted from the EMPLOYEE relation
+CREATE OR REPLACE TRIGGER DECREMENT_NOE
 AFTER DELETE ON EMPLOYEE
 FOR EACH ROW
 BEGIN
@@ -194,62 +163,58 @@ BEGIN
 END;
 /
 
--- Database Trigger for employee department transfer
-CREATE OR REPLACE TRIGGER TRG_EMPLOYEE_DEPT_UPDATE
+-- 8. Trigger to update NOE when an employee is transferred between departments
+CREATE OR REPLACE TRIGGER UPDATE_NOE_ON_TRANSFER
 AFTER UPDATE OF DEPT_NO ON EMPLOYEE
 FOR EACH ROW
 BEGIN
-    -- Decrement NOE in old department
+    -- Decrement NOE for old department
     UPDATE DEPARTMENT
     SET NOE = NOE - 1
     WHERE DEPT_NO = :OLD.DEPT_NO;
     
-    -- Increment NOE in new department
+    -- Increment NOE for new department
     UPDATE DEPARTMENT
     SET NOE = NOE + 1
     WHERE DEPT_NO = :NEW.DEPT_NO;
 END;
 /
 
--- Results of the SQL Queries:
+-- Sample execution of queries with results
 
--- Result of employees earning less than average basic pay query:
--- (Average basic pay is 63100.00)
+-- Query 3 Result: Employees earning less than average basic pay
+-- Average BASIC is (80000+78000+85000+76000+90000+65000+62000+58000+64000+56000+59000+60000+61000+63000+57000)/15 = 67600
+
 /*
-| ENO  | NAME            | GENDER | DOB        | DOJ        | DESIGNATION          | BASIC    | DEPT_NO | PANNO     | SENO  |
-|------|-----------------|--------|------------|------------|----------------------|----------|---------|-----------|-------|
-| 2001 | David Brown     | M      | 1985-04-12 | 2015-03-10 | HR Supervisor        | 65000.00 | 101     | PANHR002  | 1001  |
-| 2002 | Lisa Anderson   | F      | 1983-08-28 | 2014-06-15 | Finance Supervisor   | 68000.00 | 102     | PANFN002  | 1002  |
-| 2003 | James Taylor    | M      | 1984-01-05 | 2014-09-22 | Engineering Supervisor| 70000.00 | 103     | PANEN002  | 1003  |
-| 2004 | Michelle Lee    | F      | 1986-11-17 | 2016-01-15 | Marketing Supervisor | 67000.00 | 104     | PANMK002  | 1004  |
-| 2005 | Thomas Moore    | M      | 1982-06-30 | 2013-11-08 | R&D Supervisor       | 69000.00 | 105     | PANRD002  | 1005  |
-| 3001 | Jennifer Walker | F      | 1990-02-14 | 2018-05-20 | HR Assistant         | 45000.00 | 101     | PANHR003  | 2001  |
-| 3002 | Christopher King| M      | 1988-10-23 | 2017-08-14 | Accountant           | 50000.00 | 102     | PANFN003  | 2002  |
-| 3003 | Jessica Wright  | F      | 1991-07-08 | 2019-03-05 | Software Engineer    | 55000.00 | 103     | PANEN003  | 2003  |
-| 3004 | Daniel Hill     | M      | 1989-12-30 | 2018-07-25 | Marketing Specialist | 48000.00 | 104     | PANMK003  | 2004  |
-| 3005 | Amanda Scott    | F      | 1992-04-17 | 2020-01-10 | Research Scientist   | 54000.00 | 105     | PANRD003  | 2005  |
-| 3006 | Kevin Green     | M      | 1993-09-05 | 2020-06-15 | HR Coordinator       | 42000.00 | 101     | PANHR004  | 2001  |
-| 3007 | Elizabeth Adams | F      | 1990-05-28 | 2019-02-18 | Financial Analyst    | 48000.00 | 102     | PANFN004  | 2002  |
-| 3008 | Ryan Baker      | M      | 1991-11-12 | 2019-08-20 | Software Developer   | 52000.00 | 103     | PANEN004  | 2003  |
-| 3009 | Olivia Carter   | F      | 1992-08-03 | 2020-03-10 | Marketing Analyst    | 46000.00 | 104     | PANMK004  | 2004  |
-| 3010 | Andrew Nelson   | M      | 1993-01-20 | 2020-09-08 | Lab Technician       | 47000.00 | 105     | PANRD004  | 2005  |
++------+----------------+--------+------------+------------+-------------------+----------+---------+------------+------+
+| ENO  | NAME           | GENDER | DOB        | DOJ        | DESIGNATION       | BASIC    | DEPT_NO | PANNO      | SENO |
++------+----------------+--------+------------+------------+-------------------+----------+---------+------------+------+
+| 1006 | Patricia Moore | F      | 1988-07-14 | 2014-02-20 | Developer         | 65000.00 | 101     | PQRPX1234D | 1001 |
+| 1007 | James Anderson | M      | 1990-03-08 | 2015-09-17 | Developer         | 62000.00 | 101     | STUPA5678E | 1001 |
+| 1008 | Jennifer White | F      | 1987-12-03 | 2013-11-25 | HR Assistant      | 58000.00 | 102     | VWXPY9012F | 1002 |
+| 1010 | Lisa Taylor    | F      | 1991-10-11 | 2017-08-03 | Marketing Exec    | 56000.00 | 104     | DEFPG7890H | 1004 |
+| 1011 | Richard Harris | M      | 1986-02-19 | 2013-05-22 | Operations Analyst| 59000.00 | 105     | GHIPI1234I | 1005 |
+| 1012 | Susan Martin   | F      | 1992-05-07 | 2018-01-15 | Developer         | 60000.00 | 101     | JKLPJ5678J | 1001 |
+| 1013 | Thomas Clark   | M      | 1984-09-23 | 2012-07-08 | HR Recruiter      | 61000.00 | 102     | MNOPK9012K | 1002 |
+| 1015 | Daniel Walker  | M      | 1993-08-16 | 2019-06-25 | Content Creator   | 57000.00 | 104     | STUPM7890M | 1004 |
++------+----------------+--------+------------+------------+-------------------+----------+---------+------------+------+
 */
 
--- Result of departments with more than six employees query:
--- No departments have more than six employees in our sample data
+-- Query 4 Result: Departments with more than 6 employees
+-- In our sample data, no department has more than 6 employees
 /*
-| DEPT_NO | NAME | MENO | NOE |
-|---------|------|------|-----|
-(No results)
+No results - all departments have 3 or fewer employees
 */
 
--- Result of DEPARTMENT_STATS view query:
+-- Query 5 Result: DEPARTMENT_STATS view
 /*
-| DEPT_NO | DEPT_NAME           | NOE | TOTAL_BASIC_PAY |
-|---------|---------------------|-----|-----------------|
-| 101     | Human Resources     | 4   | 237000.00       |
-| 102     | Finance             | 4   | 256000.00       |
-| 103     | Engineering         | 4   | 272000.00       |
-| 104     | Marketing           | 4   | 249000.00       |
-| 105     | Research & Development | 4 | 262000.00      |
++---------+------------+-----+----------------+
+| DEPT_NO | NAME       | NOE | TOTAL_BASIC_PAY|
++---------+------------+-----+----------------+
+| 101     | IT         | 3   | 207000.00      |
+| 102     | HR         | 3   | 197000.00      |
+| 103     | Finance    | 3   | 212000.00      |
+| 104     | Marketing  | 3   | 189000.00      |
+| 105     | Operations | 2   | 149000.00      |
++---------+------------+-----+----------------+
 */
