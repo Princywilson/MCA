@@ -136,14 +136,17 @@ BEGIN
     SELECT RAISE(FAIL, 'Staff cannot work on more than three projects in a day');
 END;
 
--- Result:
+/* Result:
+SQL query successfully executed.
+*/
 
 -- Test the trigger
 INSERT INTO WORKS (STAFFNO, PROJECTNO, DATE_WORKED_ON, IN_TIME, OUT_TIME) VALUES
 (101, 302, '2023-03-16', '21:30:00', '22:30:00');
 
 /* Result:
-This should succeed because staff 101 is currently assigned to 3 projects on 2023-03-16.
+Error: Staff cannot work on more than three projects in a day
+-- This should succeed because staff 101 is currently assigned to 3 projects on 2023-03-16.
 */
 
 INSERT INTO WORKS (STAFFNO, PROJECTNO, DATE_WORKED_ON, IN_TIME, OUT_TIME) VALUES
