@@ -124,23 +124,19 @@ SELECT * FROM DEPT_STATISTICS ORDER BY DEPTNO;
 */
 
 -- 7. Database trigger to prevent staff from working on more than three projects on a day
-DELIMITER //
 CREATE TRIGGER prevent_excessive_work
 BEFORE INSERT ON WORKS
 FOR EACH ROW
+WHEN (
+    (SELECT COUNT(*) 
+     FROM WORKS 
+     WHERE STAFFNO = NEW.STAFFNO AND DATE_WORKED_ON = NEW.DATE_WORKED_ON) >= 3
+)
 BEGIN
-    DECLARE project_count INT;
-    
-    SELECT COUNT(*) INTO project_count
-    FROM WORKS
-    WHERE STAFFNO = NEW.STAFFNO AND DATE_WORKED_ON = NEW.DATE_WORKED_ON;
-    
-    IF project_count >= 3 THEN
-        SIGNAL SQLSTATE '45000' 
-        SET MESSAGE_TEXT = 'Staff cannot work on more than three projects in a day';
-    END IF;
-END//
-DELIMITER ;
+    SELECT RAISE(FAIL, 'Staff cannot work on more than three projects in a day');
+END;
+
+-- Result:
 
 -- Test the trigger
 INSERT INTO WORKS (STAFFNO, PROJECTNO, DATE_WORKED_ON, IN_TIME, OUT_TIME) VALUES
