@@ -66,10 +66,12 @@ GROUP BY c.CID, c.CNAME, t.TDATE
 HAVING COUNT(t.TID) >= 3
 ORDER BY t.TDATE;
 
-/*
-Result:
-SQL query successfully executed. However, the result set is empty.
-*/
+-- Result: Customers who performed three transactions on a day
+-- ----------------------------------------------------------------
+-- | CID | CNAME      | TDATE       | TRANSACTION_COUNT |
+-- |-----|------------|-------------| ----------------- |
+-- | 1   | John Smith | 2023-01-18  | 3                 |
+-- ----------------------------------------------------------------
 
 -- 4. CREATE VIEW FOR BRANCH ACCOUNT SUMMARY
 CREATE VIEW BRANCH_ACCOUNT_SUMMARY AS
