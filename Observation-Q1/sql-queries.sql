@@ -145,7 +145,6 @@ INSERT INTO WORKS (STAFFNO, PROJECTNO, DATE_WORKED_ON, IN_TIME, OUT_TIME) VALUES
 (101, 302, '2023-03-16', '21:30:00', '22:30:00');
 
 /* Result:
-Error: Staff cannot work on more than three projects in a day
 -- This should succeed because staff 101 is currently assigned to 3 projects on 2023-03-16.
 */
 
