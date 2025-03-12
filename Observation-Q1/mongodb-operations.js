@@ -1,317 +1,81 @@
-// MongoDB CRUD Operations for STAFF and DEPT collections
+// Assuming you have a MongoDB database named 'company' and collections 'staff' and 'dept'
 
-// 1. Creating collections
-db.createCollection("staff")
-db.createCollection("dept")
+// CREATE operations
 
-// 2. CREATE - Inserting departments
-db.dept.insertMany([
-  { deptNo: 1, name: "IT" },
-  { deptNo: 2, name: "HR" },
-  { deptNo: 3, name: "Finance" },
-  { deptNo: 4, name: "Marketing" },
-  { deptNo: 5, name: "Operations" }
-])
+// Insert a new department into the DEPT collection
+db.dept.insertOne({
+  DEPTNO: 6,
+  NAME: "Research"
+});
+// Output: { "acknowledged" : true, "insertedId" : ObjectId("...") }
 
-// Result:
-/*
-{
-  "acknowledged": true,
-  "insertedIds": [
-    ObjectId("..."),
-    ObjectId("..."),
-    ObjectId("..."),
-    ObjectId("..."),
-    ObjectId("...")
-  ]
-}
-*/
+// Insert a new staff member into the STAFF collection
+db.staff.insertOne({
+  STAFFNO: 111,
+  NAME: "Alice Johnson",
+  DOB: ISODate("1995-10-20"),
+  GENDER: "F",
+  DOJ: ISODate("2023-01-10"),
+  DESIGNATION: "Junior Developer",
+  BASIC_PAY: 60000,
+  DEPTNO: 1
+});
+// Output: { "acknowledged" : true, "insertedId" : ObjectId("...") }
 
-// 3. CREATE - Inserting staff
-db.staff.insertMany([
-  {
-    staffNo: 101,
-    name: "John Smith",
-    dob: new Date("1985-05-15"),
-    gender: "M",
-    doj: new Date("2010-06-20"),
-    designation: "Senior Developer",
-    basicPay: 85000.00,
-    deptNo: 1
-  },
-  {
-    staffNo: 102,
-    name: "Emma Wilson",
-    dob: new Date("1990-03-25"),
-    gender: "F",
-    doj: new Date("2015-04-10"),
-    designation: "HR Manager",
-    basicPay: 75000.00,
-    deptNo: 2
-  },
-  {
-    staffNo: 103,
-    name: "Michael Brown",
-    dob: new Date("1982-11-08"),
-    gender: "M",
-    doj: new Date("2009-01-15"),
-    designation: "Financial Analyst",
-    basicPay: 70000.00,
-    deptNo: 3
-  },
-  {
-    staffNo: 104,
-    name: "Sophia Lee",
-    dob: new Date("1988-07-19"),
-    gender: "F",
-    doj: new Date("2012-09-30"),
-    designation: "Marketing Specialist",
-    basicPay: 65000.00,
-    deptNo: 4
-  },
-  {
-    staffNo: 105,
-    name: "Robert Johnson",
-    dob: new Date("1980-02-28"),
-    gender: "M",
-    doj: new Date("2008-03-05"),
-    designation: "Operations Manager",
-    basicPay: 90000.00,
-    deptNo: 5
-  }
-])
 
-// Result:
-/*
-{
-  "acknowledged": true,
-  "insertedIds": [
-    ObjectId("..."),
-    ObjectId("..."),
-    ObjectId("..."),
-    ObjectId("..."),
-    ObjectId("...")
-  ]
-}
-*/
+// READ operations
 
-// 4. READ - Retrieving all departments
-db.dept.find()
+// Find all departments
+db.dept.find({});
+// Output: [ { "_id" : ObjectId("..."), "DEPTNO" : 1, "NAME" : "IT" }, { "_id" : ObjectId("..."), "DEPTNO" : 2, "NAME" : "HR" }, ... ]
 
-// Result:
-/*
-[
-  { "_id": ObjectId("..."), "deptNo": 1, "name": "IT" },
-  { "_id": ObjectId("..."), "deptNo": 2, "name": "HR" },
-  { "_id": ObjectId("..."), "deptNo": 3, "name": "Finance" },
-  { "_id": ObjectId("..."), "deptNo": 4, "name": "Marketing" },
-  { "_id": ObjectId("..."), "deptNo": 5, "name": "Operations" }
-]
-*/
+// Find staff members in the IT department (DEPTNO: 1)
+db.staff.find({ DEPTNO: 1 });
+// Output: [ { "_id" : ObjectId("..."), "STAFFNO" : 101, "NAME" : "John Smith", ... }, { "_id" : ObjectId("..."), "STAFFNO" : 106, "NAME" : "Jennifer Davis", ... }, { "_id" : ObjectId("..."), "STAFFNO" : 111, "NAME" : "Alice Johnson", ... } ]
 
-// 5. READ - Retrieving all staff
-db.staff.find().pretty()
+// Find staff members with BASIC_PAY greater than 70000
+db.staff.find({ BASIC_PAY: { $gt: 70000 } });
+// Output: [ { "_id" : ObjectId("..."), "STAFFNO" : 101, "NAME" : "John Smith", ... }, { "_id" : ObjectId("..."), "STAFFNO" : 102, "NAME" : "Emma Wilson", ... }, { "_id" : ObjectId("..."), "STAFFNO" : 103, "NAME" : "Michael Brown", ... }, { "_id" : ObjectId("..."), "STAFFNO" : 105, "NAME" : "Robert Johnson", ... }, { "_id" : ObjectId("..."), "STAFFNO" : 106, "NAME" : "Jennifer Davis", ... } ]
 
-// Result:
-/*
-[
-  {
-    "_id": ObjectId("..."),
-    "staffNo": 101,
-    "name": "John Smith",
-    "dob": ISODate("1985-05-15T00:00:00Z"),
-    "gender": "M",
-    "doj": ISODate("2010-06-20T00:00:00Z"),
-    "designation": "Senior Developer",
-    "basicPay": 85000,
-    "deptNo": 1
-  },
-  {
-    "_id": ObjectId("..."),
-    "staffNo": 102,
-    "name": "Emma Wilson",
-    "dob": ISODate("1990-03-25T00:00:00Z"),
-    "gender": "F",
-    "doj": ISODate("2015-04-10T00:00:00Z"),
-    "designation": "HR Manager",
-    "basicPay": 75000,
-    "deptNo": 2
-  },
-  ...
-]
-*/
+// Find a staff member by STAFFNO
+db.staff.findOne({ STAFFNO: 104 });
+// Output: { "_id" : ObjectId("..."), "STAFFNO" : 104, "NAME" : "Sophia Lee", ... }
 
-// 6. READ - Finding staff in IT department (deptNo: 1)
-db.staff.find({ deptNo: 1 }).pretty()
 
-// Result:
-/*
-[
-  {
-    "_id": ObjectId("..."),
-    "staffNo": 101,
-    "name": "John Smith",
-    "dob": ISODate("1985-05-15T00:00:00Z"),
-    "gender": "M",
-    "doj": ISODate("2010-06-20T00:00:00Z"),
-    "designation": "Senior Developer",
-    "basicPay": 85000,
-    "deptNo": 1
-  }
-]
-*/
+// UPDATE operations
 
-// 7. UPDATE - Updating a staff member's basic pay
+// Update the designation of staff member with STAFFNO 106
 db.staff.updateOne(
-  { staffNo: 101 },
-  { $set: { basicPay: 90000.00, designation: "Lead Developer" } }
-)
+  { STAFFNO: 106 },
+  { $set: { DESIGNATION: "Senior Developer" } }
+);
+// Output: { "acknowledged" : true, "matchedCount" : 1, "modifiedCount" : 1, "upsertedCount" : 0 }
 
-// Result:
-/*
-{
-  "acknowledged": true,
-  "matchedCount": 1,
-  "modifiedCount": 1
-}
-*/
+// Increase the BASIC_PAY of all staff members in the HR department by 10%
+db.staff.updateMany(
+  { DEPTNO: 2 },
+  { $mul: { BASIC_PAY: 1.1 } }
+);
+// Output: { "acknowledged" : true, "matchedCount" : 2, "modifiedCount" : 2, "upsertedCount" : 0 }
 
-// 8. UPDATE - Updating a department name
+// Update the name of the department with DEPTNO 4
 db.dept.updateOne(
-  { deptNo: 1 },
-  { $set: { name: "Information Technology" } }
-)
+  { DEPTNO: 4 },
+  { $set: { NAME: "Sales and Marketing" } }
+);
+// Output: { "acknowledged" : true, "matchedCount" : 1, "modifiedCount" : 1, "upsertedCount" : 0 }
 
-// Result:
-/*
-{
-  "acknowledged": true,
-  "matchedCount": 1,
-  "modifiedCount": 1
-}
-*/
 
-// 9. READ - Verify the updates
-db.staff.findOne({ staffNo: 101 })
+// DELETE operations
 
-// Result:
-/*
-{
-  "_id": ObjectId("..."),
-  "staffNo": 101,
-  "name": "John Smith",
-  "dob": ISODate("1985-05-15T00:00:00Z"),
-  "gender": "M",
-  "doj": ISODate("2010-06-20T00:00:00Z"),
-  "designation": "Lead Developer",
-  "basicPay": 90000,
-  "deptNo": 1
-}
-*/
+// Delete the staff member with STAFFNO 111
+db.staff.deleteOne({ STAFFNO: 111 });
+// Output: { "acknowledged" : true, "deletedCount" : 1 }
 
-db.dept.findOne({ deptNo: 1 })
+// Delete all staff members in the Finance department (DEPTNO: 3)
+db.staff.deleteMany({ DEPTNO: 3 });
+// Output: { "acknowledged" : true, "deletedCount" : 2 }
 
-// Result:
-/*
-{
-  "_id": ObjectId("..."),
-  "deptNo": 1,
-  "name": "Information Technology"
-}
-*/
-
-// 10. DELETE - Deleting a staff member
-db.staff.deleteOne({ staffNo: 105 })
-
-// Result:
-/*
-{
-  "acknowledged": true,
-  "deletedCount": 1
-}
-*/
-
-// 11. DELETE - Deleting a department (note: this would require handling related staff!)
-db.dept.deleteOne({ deptNo: 5 })
-
-// Result:
-/*
-{
-  "acknowledged": true,
-  "deletedCount": 1
-}
-*/
-
-// 12. READ - Verify the deletions
-db.staff.find({ staffNo: 105 })
-// Result: []
-
-db.dept.find({ deptNo: 5 })
-// Result: []
-
-// 13. Advanced query - Aggregation to get department statistics
-db.staff.aggregate([
-  {
-    $group: {
-      _id: "$deptNo",
-      numberOfStaff: { $sum: 1 },
-      totalBasicPay: { $sum: "$basicPay" },
-      avgBasicPay: { $avg: "$basicPay" }
-    }
-  },
-  {
-    $lookup: {
-      from: "dept",
-      localField: "_id",
-      foreignField: "deptNo",
-      as: "department"
-    }
-  },
-  {
-    $project: {
-      _id: 0,
-      deptNo: "$_id",
-      departmentName: { $arrayElemAt: ["$department.name", 0] },
-      numberOfStaff: 1,
-      totalBasicPay: 1,
-      avgBasicPay: 1
-    }
-  },
-  {
-    $sort: { deptNo: 1 }
-  }
-])
-
-// Result:
-/*
-[
-  {
-    "deptNo": 1,
-    "departmentName": "Information Technology",
-    "numberOfStaff": 1,
-    "totalBasicPay": 90000,
-    "avgBasicPay": 90000
-  },
-  {
-    "deptNo": 2,
-    "departmentName": "HR",
-    "numberOfStaff": 1,
-    "totalBasicPay": 75000,
-    "avgBasicPay": 75000
-  },
-  {
-    "deptNo": 3,
-    "departmentName": "Finance",
-    "numberOfStaff": 1,
-    "totalBasicPay": 70000,
-    "avgBasicPay": 70000
-  },
-  {
-    "deptNo": 4,
-    "departmentName": "Marketing",
-    "numberOfStaff": 1,
-    "totalBasicPay": 65000,
-    "avgBasicPay": 65000
-  }
-]
-*/
+// Delete the department with DEPTNO 6
+db.dept.deleteOne({ DEPTNO: 6 });
+// Output: { "acknowledged" : true, "deletedCount" : 1 }
