@@ -1,143 +1,67 @@
-// MongoDB CRUD Operations for STUDENT and BRANCH collections
+// javascript
+// Assuming you have a MongoDB connection established and a database selected
 
-// Connect to MongoDB
-use examination_system
+// --- CREATE ---
 
-// 1. Create Operations
+// Insert a new branch
+db.branches.insertOne({
+  BCODE: "MECH",
+  BNAME: "Mechanical Engineering",
+  DNO: 4
+});
+// Output: { "acknowledged" : true, "insertedId" : ObjectId("...") }
 
-// Create STUDENT collection
-db.createCollection("student")
+// Insert a new student
+db.students.insertOne({
+  ROLLNO: "S005",
+  NAME: "David Lee",
+  DOB: new Date("2002-07-22"),
+  GENDER: "M",
+  DOA: new Date("2021-08-01"),
+  BCODE: "MECH"
+});
+// Output: { "acknowledged" : true, "insertedId" : ObjectId("...") }
 
-// Insert data into STUDENT collection
-db.student.insertMany([
-  {
-    rollno: "S001",
-    name: "John Doe",
-    dob: new Date("2000-05-15"),
-    gender: "M",
-    doa: new Date("2020-08-01"),
-    bcode: "CSE"
-  },
-  {
-    rollno: "S002",
-    name: "Jane Smith",
-    dob: new Date("2001-03-21"),
-    gender: "F",
-    doa: new Date("2020-08-01"),
-    bcode: "IT"
-  },
-  {
-    rollno: "S003",
-    name: "Robert Brown",
-    dob: new Date("2000-11-10"),
-    gender: "M",
-    doa: new Date("2020-08-01"),
-    bcode: "ECE"
-  },
-  {
-    rollno: "S004",
-    name: "Emily Davis",
-    dob: new Date("2001-07-18"),
-    gender: "F",
-    doa: new Date("2020-08-01"),
-    bcode: "EEE"
-  },
-  {
-    rollno: "S005",
-    name: "Michael Wilson",
-    dob: new Date("2000-09-22"),
-    gender: "M",
-    doa: new Date("2020-08-01"),
-    bcode: "MECH"
-  }
-])
 
-// Create BRANCH collection
-db.createCollection("branch")
+// --- READ ---
 
-// Insert data into BRANCH collection
-db.branch.insertMany([
-  {
-    bcode: "CSE",
-    bname: "Computer Science and Engineering",
-    dno: 1
-  },
-  {
-    bcode: "IT",
-    bname: "Information Technology",
-    dno: 2
-  },
-  {
-    bcode: "ECE",
-    bname: "Electronics and Communication Engineering",
-    dno: 3
-  },
-  {
-    bcode: "EEE",
-    bname: "Electrical and Electronics Engineering",
-    dno: 4
-  },
-  {
-    bcode: "MECH",
-    bname: "Mechanical Engineering",
-    dno: 5
-  }
-])
+// Find all branches
+db.branches.find({});
+// Output: [ { "_id" : ObjectId("..."), "BCODE" : "CSE", "BNAME" : "Computer Science and Engineering", "DNO" : 1 }, ... ]
 
-// 2. Read Operations
+// Find a student by ROLLNO
+db.students.findOne({ ROLLNO: "S002" });
+// Output: { "_id" : ObjectId("..."), "ROLLNO" : "S002", "NAME" : "Jane Smith", "DOB" : ISODate("2001-03-21T00:00:00Z"), "GENDER" : "F", "DOA" : ISODate("2020-08-01T00:00:00Z"), "BCODE" : "IT" }
 
-// Read all students
-db.student.find()
+// Find all students in a specific branch
+db.students.find({ BCODE: "CSE" });
+// Output: [ { "_id" : ObjectId("..."), "ROLLNO" : "S001", "NAME" : "John Doe", "DOB" : ISODate("2000-05-15T00:00:00Z"), "GENDER" : "M", "DOA" : ISODate("2020-08-01T00:00:00Z"), "BCODE" : "CSE" } ]
 
-// Read all branches
-db.branch.find()
 
-// Read specific student
-db.student.find({rollno: "S001"})
+// --- UPDATE ---
 
-// Read students by branch
-db.student.find({bcode: "CSE"})
+// Update the name of a branch
+db.branches.updateOne(
+  { BCODE: "IT" },
+  { $set: { BNAME: "Information Technologies" } }
+);
+// Output: { "acknowledged" : true, "matchedCount" : 1, "modifiedCount" : 1, "upsertedCount" : 0 }
 
-// Read branches by department
-db.branch.find({dno: 1})
+// Update the DOB of a student
+db.students.updateOne(
+  { ROLLNO: "S003" },
+  { $set: { DOB: new Date("2000-11-11") } }
+);
+// Output: { "acknowledged" : true, "matchedCount" : 1, "modifiedCount" : 1, "upsertedCount" : 0 }
 
-// 3. Update Operations
 
-// Update a student's name
-db.student.updateOne(
-  {rollno: "S001"},
-  {$set: {name: "John Smith"}}
-)
-
-// Update multiple students' date of admission
-db.student.updateMany(
-  {bcode: "CSE"},
-  {$set: {doa: new Date("2020-08-15")}}
-)
-
-// Update a branch name
-db.branch.updateOne(
-  {bcode: "CSE"},
-  {$set: {bname: "Computer Science Engineering"}}
-)
-
-// 4. Delete Operations
-
-// Delete a specific student
-db.student.deleteOne({rollno: "S005"})
-
-// Delete all students from a specific branch
-db.student.deleteMany({bcode: "MECH"})
+// --- DELETE ---
 
 // Delete a branch
-db.branch.deleteOne({bcode: "MECH"})
+db.branches.deleteOne({ BCODE: "MECH" });
+// Output: { "acknowledged" : true, "deletedCount" : 1 }
 
-// Sample Results Display:
+// Delete a student
+db.students.deleteOne({ ROLLNO: "S005" });
+// Output: { "acknowledged" : true, "deletedCount" : 1 }
 
-// Result of all students after operations
-print("All students after operations:")
-db.student.find().forEach(printjson)
-
-// Result of all branches after operations
-print("All branches after operations:")
-db.branch.find().forEach(printjson)
