@@ -13,13 +13,12 @@ HAVING COUNT(b.BCODE) > 3;
 SELECT c.*
 FROM COURSE c
 WHERE c.CCODE NOT IN (SELECT CCODE FROM PREREQUISITE_COURSE);
-
--- Sample output:
--- CCODE | CNAME                  | CREDITS | DNO
--- EC101 | Digital Electronics    | 4       | 3
--- EE101 | Electrical Circuits    | 4       | 4
--- ME101 | Engineering Mechanics  | 4       | 5
--- CS109 | Software Engineering   | 3       | 1
+/*
+Output:
+CCODE	CNAME	                    CREDITS	DNO
+CS101	Introduction to Programming	4	    1
+EC101	Digital Electronics	        4	    3
+*/
 
 -- 3. List the details of courses that are common for more than three branches
 SELECT c.*
@@ -28,11 +27,13 @@ JOIN BRANCH_COURSE bc ON c.CCODE = bc.CCODE
 GROUP BY c.CCODE, c.CNAME, c.CREDITS, c.DNO
 HAVING COUNT(DISTINCT bc.BCODE) > 3;
 
--- Sample output:
--- CCODE | CNAME                   | CREDITS | DNO
--- CS101 | Introduction to Programming | 4   | 1
--- CS102 | Data Structures         | 4       | 1
--- CS103 | Database Management Systems | 4   | 1
+/*
+Output:
+CCODE	CNAME	                     CREDITS   DNO
+CS101	Introduction to Programming	 4	       1
+CS102	Data Structures	             4	       1
+
+*/
 
 -- 4. List the details of students who have got a 'U' grade in more than two courses during a single enrollment
 SELECT s.*, e.SESS
@@ -56,14 +57,17 @@ GROUP BY c.CCODE, c.CNAME;
 -- To view the results of the view:
 SELECT * FROM COURSE_PREREQS;
 
--- Sample output:
--- CCODE | CNAME                   | NUM_PREREQS
--- CS101 | Introduction to Programming | 0
--- CS102 | Data Structures         | 1
--- CS103 | Database Management Systems | 1
--- CS104 | Advanced Databases      | 1
--- ...
-
+/*
+Output
+CCODE	CNAME	                    NUM_PREREQS
+CS101	Introduction to Programming	0
+CS102	Data Structures	            1
+CS103	Database Management Systems	1
+CS104	Advanced Databases	        1
+EC101	Digital Electronics	        0
+IT101	Web Development	            1
+*/
+    
 -- 6. Database trigger that will not permit a student to enroll for a course if they have not completed the prerequisite courses
 DELIMITER //
 CREATE TRIGGER check_prerequisites 
@@ -93,3 +97,23 @@ BEGIN
     END IF;
 END //
 DELIMITER ;
+
+-- Test Case 1: This INSERT should FAIL
+-- Student S003 trying to enroll in CS103 without completing CS102
+-- (CS103 requires CS102 as a prerequisite)
+INSERT INTO ENROLLS (ROLLNO, CCODE, SESS, GRADE) 
+VALUES ('S003', 'CS103', 'APRIL2022', 'B');
+
+/*
+Error: Student has not completed all prerequisite courses
+*/
+
+-- Test Case 2: This INSERT should SUCCEED
+-- Student S002 trying to enroll in CS104 after completing all prerequisites
+-- (S002 has already completed CS101, CS102, and CS103)
+INSERT INTO ENROLLS (ROLLNO, CCODE, SESS, GRADE) 
+VALUES ('S002', 'CS104', 'NOVEMBER2022', 'B');
+
+/*
+Output: SQL query successfully executed. 
+*/
