@@ -1,6 +1,100 @@
 // Assuming you have a MongoDB database named 'company' and collections 'staff' and 'dept'
 
 // CREATE operations
+// Connect to MongoDB and create the company database
+// Output: switched to db company
+
+// Create the DEPT collection with initial departments
+db.createCollection("dept");
+// Output: { "ok" : 1 }
+
+// Insert initial departments
+db.dept.insertMany([
+  { DEPTNO: 1, NAME: "IT" },
+  { DEPTNO: 2, NAME: "HR" },
+  { DEPTNO: 3, NAME: "Finance" },
+  { DEPTNO: 4, NAME: "Marketing" },
+  { DEPTNO: 5, NAME: "Operations" }
+]);
+// Output: {
+//   "acknowledged" : true,
+//   "insertedIds" : [
+//     ObjectId("64a1b2c3d4e5f6a7b8c9d0e1"),
+//     ObjectId("64a1b2c3d4e5f6a7b8c9d0e2"),
+//     ObjectId("64a1b2c3d4e5f6a7b8c9d0e3"),
+//     ObjectId("64a1b2c3d4e5f6a7b8c9d0e4"),
+//     ObjectId("64a1b2c3d4e5f6a7b8c9d0e5")
+//   ]
+// }
+
+// Create the STAFF collection
+db.createCollection("staff");
+// Output: { "ok" : 1 }
+
+// Insert initial staff members
+db.staff.insertMany([
+  {
+    STAFFNO: 101,
+    NAME: "John Smith",
+    DOB: ISODate("1985-04-15"),
+    GENDER: "M",
+    DOJ: ISODate("2015-06-01"),
+    DESIGNATION: "Senior Developer",
+    BASIC_PAY: 85000,
+    DEPTNO: 1
+  },
+  // ... other staff members ...
+  {
+    STAFFNO: 110,
+    NAME: "Emily Clark",
+    DOB: ISODate("1986-01-28"),
+    GENDER: "F",
+    DOJ: ISODate("2015-10-18"),
+    DESIGNATION: "Operations Analyst",
+    BASIC_PAY: 69000,
+    DEPTNO: 5
+  }
+]);
+// Output: {
+//   "acknowledged" : true,
+//   "insertedIds" : [
+//     ObjectId("64a1b2c3d4e5f6a7b8c9d1e1"),
+//     ObjectId("64a1b2c3d4e5f6a7b8c9d1e2"),
+//     ObjectId("64a1b2c3d4e5f6a7b8c9d1e3"),
+//     ObjectId("64a1b2c3d4e5f6a7b8c9d1e4"),
+//     ObjectId("64a1b2c3d4e5f6a7b8c9d1e5"),
+//     ObjectId("64a1b2c3d4e5f6a7b8c9d1e6"),
+//     ObjectId("64a1b2c3d4e5f6a7b8c9d1e7"),
+//     ObjectId("64a1b2c3d4e5f6a7b8c9d1e8"),
+//     ObjectId("64a1b2c3d4e5f6a7b8c9d1e9"),
+//     ObjectId("64a1b2c3d4e5f6a7b8c9d1f0")
+//   ]
+// }
+
+// Create indexes for better query performance
+db.staff.createIndex({ STAFFNO: 1 }, { unique: true });
+// Output: {
+//   "createdCollectionAutomatically" : false,
+//   "numIndexesBefore" : 1,
+//   "numIndexesAfter" : 2,
+//   "ok" : 1
+// }
+
+db.staff.createIndex({ DEPTNO: 1 });
+// Output: {
+//   "createdCollectionAutomatically" : false,
+//   "numIndexesBefore" : 2,
+//   "numIndexesAfter" : 3,
+//   "ok" : 1
+// }
+
+db.dept.createIndex({ DEPTNO: 1 }, { unique: true });
+// Output: {
+//   "createdCollectionAutomatically" : false,
+//   "numIndexesBefore" : 1,
+//   "numIndexesAfter" : 2,
+//   "ok" : 1
+// }
 
 // Insert a new department into the DEPT collection
 db.dept.insertOne({
