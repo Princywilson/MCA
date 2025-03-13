@@ -30,7 +30,6 @@ ORDER BY BASIC_PAY DESC;
 | 106     | Jennifer Davis   | 1992-09-12 | F      | 2016-11-22 | Developer           | 72000.00  | 1      |
 | 108     | Sarah Taylor     | 1986-12-10 | F      | 2011-05-08 | Accountant          | 68000.00  | 3      |
 | 110     | Olivia Garcia    | 1984-06-30 | F      | 2010-10-25 | Operations Analyst  | 67000.00  | 5      |
-| 112     | Emily Anderson   | 1993-10-05 | F      | 2018-02-19 | HR Specialist       | 62000.00  | 2      |
 | 109     | James Wilson     | 1991-08-22 | M      | 2017-03-14 | Marketing Coordinator | 60000.00 | 4     |
 | 107     | David Miller     | 1987-04-05 | M      | 2013-08-17 | HR Assistant        | 55000.00  | 2      |
 +---------+------------------+------------+--------+------------+---------------------+-----------+--------+
@@ -63,7 +62,6 @@ ORDER BY s.STAFFNO;
 | STAFFNO | NAME          | DESIGNATION        | BASIC_PAY | SkillCount|
 +---------+---------------+--------------------+-----------+-----------+
 | 101     | John Smith    | Senior Developer   | 85000.00  | 4         |
-| 111     | Daniel Martinez | System Administrator | 78000.00 | 4     |
 +---------+---------------+--------------------+-----------+-----------+
 */
 
@@ -88,9 +86,6 @@ ORDER BY s.STAFFNO;
 | 106     | Jennifer Davis   | Developer           | 72000.00  | IT         |
 | 108     | Sarah Taylor     | Accountant          | 68000.00  | Finance    |
 | 110     | Olivia Garcia    | Operations Analyst  | 67000.00  | Operations |
-| 111     | Daniel Martinez  | System Administrator| 78000.00  | IT         |
-| 112     | Emily Anderson   | HR Specialist       | 62000.00  | HR         |
-| 113     | William Thomas   | Finance Manager     | 88000.00  | Finance    |
 +---------+------------------+---------------------+-----------+------------+
 */
 
