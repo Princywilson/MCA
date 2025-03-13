@@ -8,6 +8,12 @@
 db.createCollection("dept");
 // Output: { "ok" : 1 }
 
+// Create the STAFF collection
+db.createCollection("staff");
+// Output: { "ok" : 1 }
+
+
+
 // Insert initial departments
 db.dept.insertMany([
   { DEPTNO: 1, NAME: "IT" },
@@ -27,12 +33,6 @@ db.dept.insertMany([
 //   ]
 // }
 
-// Create the STAFF collection
-db.createCollection("staff");
-// Output: { "ok" : 1 }
-
-// Insert initial staff members
-db.staff.insertMany([
   // Insert initial staff members
 db.staff.insertMany([
   {
