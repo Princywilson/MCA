@@ -105,8 +105,8 @@ db.staff.findOne({ STAFFNO: 104 });
 
 // Update the designation of staff member with STAFFNO 106
 db.staff.updateOne(
-  { STAFFNO: 106 },
-  { $set: { DESIGNATION: "Senior Developer" } }
+  { STAFFNO: 102 },
+  { $set: { DESIGNATION: "HR Specialist" } }
 );
 // Output: { "acknowledged" : true, "matchedCount" : 1, "modifiedCount" : 1, "upsertedCount" : 0 }
 
@@ -116,13 +116,6 @@ db.staff.updateMany(
   { $mul: { BASIC_PAY: 1.1 } }
 );
 // Output: { "acknowledged" : true, "matchedCount" : 2, "modifiedCount" : 2, "upsertedCount" : 0 }
-
-// Update the name of the department with DEPTNO 4
-db.dept.updateOne(
-  { DEPTNO: 4 },
-  { $set: { NAME: "Sales and Marketing" } }
-);
-// Output: { "acknowledged" : true, "matchedCount" : 1, "modifiedCount" : 1, "upsertedCount" : 0 }
 
 
 // DELETE operations
@@ -134,7 +127,3 @@ db.staff.deleteOne({ STAFFNO: 111 });
 // Delete all staff members in the Finance department (DEPTNO: 3)
 db.staff.deleteMany({ DEPTNO: 3 });
 // Output: { "acknowledged" : true, "deletedCount" : 2 }
-
-// Delete the department with DEPTNO 6
-db.dept.deleteOne({ DEPTNO: 6 });
-// Output: { "acknowledged" : true, "deletedCount" : 1 }
