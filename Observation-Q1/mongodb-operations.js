@@ -33,6 +33,8 @@ db.createCollection("staff");
 
 // Insert initial staff members
 db.staff.insertMany([
+  // Insert initial staff members
+db.staff.insertMany([
   {
     STAFFNO: 101,
     NAME: "John Smith",
@@ -43,16 +45,25 @@ db.staff.insertMany([
     BASIC_PAY: 85000,
     DEPTNO: 1
   },
-  // ... other staff members ...
   {
-    STAFFNO: 110,
-    NAME: "Emily Clark",
-    DOB: ISODate("1986-01-28"),
+    STAFFNO: 102,
+    NAME: "Emma Wilson",
+    DOB: ISODate("1990-08-22"),
     GENDER: "F",
-    DOJ: ISODate("2015-10-18"),
-    DESIGNATION: "Operations Analyst",
-    BASIC_PAY: 69000,
-    DEPTNO: 5
+    DOJ: ISODate("2017-03-15"),
+    DESIGNATION: "HR Manager",
+    BASIC_PAY: 78000,
+    DEPTNO: 2
+  },
+  {
+    STAFFNO: 103,
+    NAME: "Michael Brown",
+    DOB: ISODate("1988-12-10"),
+    GENDER: "M",
+    DOJ: ISODate("2016-09-20"),
+    DESIGNATION: "Finance Director",
+    BASIC_PAY: 92000,
+    DEPTNO: 3
   }
 ]);
 // Output: {
@@ -70,52 +81,6 @@ db.staff.insertMany([
 //     ObjectId("64a1b2c3d4e5f6a7b8c9d1f0")
 //   ]
 // }
-
-// Create indexes for better query performance
-db.staff.createIndex({ STAFFNO: 1 }, { unique: true });
-// Output: {
-//   "createdCollectionAutomatically" : false,
-//   "numIndexesBefore" : 1,
-//   "numIndexesAfter" : 2,
-//   "ok" : 1
-// }
-
-db.staff.createIndex({ DEPTNO: 1 });
-// Output: {
-//   "createdCollectionAutomatically" : false,
-//   "numIndexesBefore" : 2,
-//   "numIndexesAfter" : 3,
-//   "ok" : 1
-// }
-
-db.dept.createIndex({ DEPTNO: 1 }, { unique: true });
-// Output: {
-//   "createdCollectionAutomatically" : false,
-//   "numIndexesBefore" : 1,
-//   "numIndexesAfter" : 2,
-//   "ok" : 1
-// }
-
-// Insert a new department into the DEPT collection
-db.dept.insertOne({
-  DEPTNO: 6,
-  NAME: "Research"
-});
-// Output: { "acknowledged" : true, "insertedId" : ObjectId("...") }
-
-// Insert a new staff member into the STAFF collection
-db.staff.insertOne({
-  STAFFNO: 111,
-  NAME: "Alice Johnson",
-  DOB: ISODate("1995-10-20"),
-  GENDER: "F",
-  DOJ: ISODate("2023-01-10"),
-  DESIGNATION: "Junior Developer",
-  BASIC_PAY: 60000,
-  DEPTNO: 1
-});
-// Output: { "acknowledged" : true, "insertedId" : ObjectId("...") }
-
 
 // READ operations
 
