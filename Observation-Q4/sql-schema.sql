@@ -60,21 +60,11 @@ INSERT INTO DEPARTMENT (DEPT_NO, NAME, NOE) VALUES
 
 -- Insert Employees
 INSERT INTO EMPLOYEE (ENO, NAME, GENDER, DOB, DOJ, DESIGNATION, BASIC, DEPT_NO, PANNO, SENO) VALUES
-('E001', 'John Smith', 'M', '1980-05-15', '2010-01-10', 'HR Manager', 85000.00, 'D001', 'PAN001', NULL),
-('E002', 'Jane Doe', 'F', '1985-08-20', '2012-03-15', 'Senior Engineer', 80000.00, 'D002', 'PAN002', NULL),
-('E003', 'Robert Johnson', 'M', '1975-12-03', '2008-07-20', 'Finance Manager', 90000.00, 'D003', 'PAN003', NULL),
-('E004', 'Emily Brown', 'F', '1988-04-25', '2014-09-05', 'Marketing Manager', 78000.00, 'D004', 'PAN004', NULL),
-('E005', 'Michael Chen', 'M', '1982-10-08', '2011-11-12', 'Research Manager', 88000.00, 'D005', 'PAN005', NULL);
-
--- Update SENO for the first set of employees
-UPDATE EMPLOYEE SET SENO = 'E001' WHERE ENO IN ('E001');
-UPDATE EMPLOYEE SET SENO = 'E002' WHERE ENO IN ('E002');
-UPDATE EMPLOYEE SET SENO = 'E003' WHERE ENO IN ('E003');
-UPDATE EMPLOYEE SET SENO = 'E004' WHERE ENO IN ('E004');
-UPDATE EMPLOYEE SET SENO = 'E005' WHERE ENO IN ('E005');
-
--- Insert more employees with supervisors
-INSERT INTO EMPLOYEE (ENO, NAME, GENDER, DOB, DOJ, DESIGNATION, BASIC, DEPT_NO, PANNO, SENO) VALUES
+('E001', 'John Smith', 'M', '1980-05-15', '2010-01-10', 'HR Manager', 85000.00, 'D001', 'PAN001', 'E001'),
+('E002', 'Jane Doe', 'F', '1985-08-20', '2012-03-15', 'Senior Engineer', 80000.00, 'D002', 'PAN002', 'E002'),
+('E003', 'Robert Johnson', 'M', '1975-12-03', '2008-07-20', 'Finance Manager', 90000.00, 'D003', 'PAN003', 'E003'),
+('E004', 'Emily Brown', 'F', '1988-04-25', '2014-09-05', 'Marketing Manager', 78000.00, 'D004', 'PAN004', 'E004'),
+('E005', 'Michael Chen', 'M', '1982-10-08', '2011-11-12', 'Research Manager', 88000.00, 'D005', 'PAN005', 'E005'),
 ('E006', 'Sarah Wilson', 'F', '1990-06-18', '2015-04-22', 'HR Assistant', 55000.00, 'D001', 'PAN006', 'E001'),
 ('E007', 'David Lee', 'M', '1987-09-30', '2014-02-15', 'Software Engineer', 75000.00, 'D002', 'PAN007', 'E002'),
 ('E008', 'Amanda Miller', 'F', '1991-11-12', '2016-08-10', 'Financial Analyst', 65000.00, 'D003', 'PAN008', 'E003'),
