@@ -5,7 +5,7 @@ db.createCollection("customer");
 db.createCollection("account");
 
 // Insert a new customer into the CUSTOMER collection
-db.customer.insertOne(
+db.customer.insertMany(
    {
   CID: 1,
   CNAME: "John Smith"
@@ -24,7 +24,7 @@ db.customer.insertOne(
 // { "acknowledged" : true, "insertedId" : ObjectId("...") }
 
 // Insert a new account into the ACCOUNT collection
-db.account.insertOne(
+db.account.insertMany(
   {
   ANO: "A001",
   ATYPE: "C",
