@@ -69,34 +69,23 @@ IT101	Web Development	            1
 */
     
 -- 6. Database trigger that will not permit a student to enroll for a course if they have not completed the prerequisite courses
-DELIMITER //
 CREATE TRIGGER check_prerequisites 
 BEFORE INSERT ON ENROLLS
 FOR EACH ROW
+WHEN (
+    (SELECT COUNT(*) FROM PREREQUISITE_COURSE WHERE CCODE = NEW.CCODE) > 0
+    AND 
+    (SELECT COUNT(*) FROM PREREQUISITE_COURSE pc
+     JOIN ENROLLS e ON pc.PCCODE = e.CCODE
+     WHERE pc.CCODE = NEW.CCODE
+     AND e.ROLLNO = NEW.ROLLNO
+     AND e.GRADE IN ('S', 'A', 'B', 'C', 'D', 'E')) 
+     < 
+     (SELECT COUNT(*) FROM PREREQUISITE_COURSE WHERE CCODE = NEW.CCODE)
+)
 BEGIN
-    DECLARE prereq_count INT;
-    DECLARE completed_count INT;
-    
-    -- Count the number of prerequisites for the course
-    SELECT COUNT(*) INTO prereq_count
-    FROM PREREQUISITE_COURSE
-    WHERE CCODE = NEW.CCODE;
-    
-    -- Count the number of completed prerequisites
-    SELECT COUNT(*) INTO completed_count
-    FROM PREREQUISITE_COURSE pc
-    JOIN ENROLLS e ON pc.PCCODE = e.CCODE
-    WHERE pc.CCODE = NEW.CCODE
-    AND e.ROLLNO = NEW.ROLLNO
-    AND e.GRADE IN ('S', 'A', 'B', 'C', 'D', 'E');
-    
-    -- If there are prerequisites and not all have been completed
-    IF (prereq_count > 0 AND completed_count < prereq_count) THEN
-        SIGNAL SQLSTATE '45000'
-        SET MESSAGE_TEXT = 'Student has not completed all prerequisite courses';
-    END IF;
-END //
-DELIMITER ;
+    SELECT RAISE(ABORT, 'Student has not completed all prerequisite courses');
+END;
 
 -- Test Case 1: This INSERT should FAIL
 -- Student S003 trying to enroll in CS103 without completing CS102
