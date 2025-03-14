@@ -52,11 +52,11 @@ CREATE TABLE WORKSFOR (
 
 -- Insert Departments (initially without MENO due to circular dependency)
 INSERT INTO DEPARTMENT (DEPT_NO, NAME, NOE) VALUES
-('D001', 'Human Resources', 0),
-('D002', 'Engineering', 0),
-('D003', 'Finance', 0),
-('D004', 'Marketing', 0),
-('D005', 'Research', 0);
+('D001', 'Human Resources', 2),
+('D002', 'Engineering', 2),
+('D003', 'Finance', 2),
+('D004', 'Marketing', 2),
+('D005', 'Research', 2);
 
 -- Insert Employees
 INSERT INTO EMPLOYEE (ENO, NAME, GENDER, DOB, DOJ, DESIGNATION, BASIC, DEPT_NO, PANNO, SENO) VALUES
@@ -77,13 +77,6 @@ UPDATE DEPARTMENT SET MENO = 'E002' WHERE DEPT_NO = 'D002';
 UPDATE DEPARTMENT SET MENO = 'E003' WHERE DEPT_NO = 'D003';
 UPDATE DEPARTMENT SET MENO = 'E004' WHERE DEPT_NO = 'D004';
 UPDATE DEPARTMENT SET MENO = 'E005' WHERE DEPT_NO = 'D005';
-
--- Manually update NOE in departments (later this will be handled by triggers)
-UPDATE DEPARTMENT SET NOE = 2 WHERE DEPT_NO = 'D001';
-UPDATE DEPARTMENT SET NOE = 2 WHERE DEPT_NO = 'D002';
-UPDATE DEPARTMENT SET NOE = 2 WHERE DEPT_NO = 'D003';
-UPDATE DEPARTMENT SET NOE = 2 WHERE DEPT_NO = 'D004';
-UPDATE DEPARTMENT SET NOE = 2 WHERE DEPT_NO = 'D005';
 
 -- Insert Projects
 INSERT INTO PROJECT (PROJ_NO, NAME, DEPT_NO) VALUES
