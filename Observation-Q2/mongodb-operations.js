@@ -5,7 +5,7 @@ db.createCollection("customer");
 db.createCollection("account");
 
 // Insert a new customer into the CUSTOMER collection
-db.customer.insertMany(
+db.customer.insertMany([
    {
   CID: 1,
   CNAME: "John Smith"
@@ -18,13 +18,13 @@ db.customer.insertMany(
   CID: 3,
   CNAME: "David Lee"
 }
-);
+]);
 
 // Output/Result:
 // { "acknowledged" : true, "insertedId" : ObjectId("...") }
 
 // Insert a new account into the ACCOUNT collection
-db.account.insertMany(
+db.account.insertMany([
   {
   ANO: "A001",
   ATYPE: "C",
@@ -46,7 +46,7 @@ db.account.insertMany(
   CID: 3,
   BCODE: "B003"
 }
-);
+]);
 
 // Output/Result:
 // { "acknowledged" : true, "insertedId" : ObjectId("...") }
