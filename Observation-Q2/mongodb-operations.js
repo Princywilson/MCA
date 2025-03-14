@@ -1,19 +1,19 @@
 // Assuming you have a MongoDB connection established and databases named 'customerDB'
 
 // --- CREATE Operations ---
-db.createCollection("customer")
-db.createCollection("account")
+db.createCollection("customer");
+db.createCollection("account");
 
 // Insert a new customer into the CUSTOMER collection
 db.customer.insertOne(
    {
   CID: 1,
   CNAME: "John Smith"
-}
+},
  {
   CID: 2,
   CNAME: "Mary Johnson"
-}
+},
 {
   CID: 3,
   CNAME: "David Lee"
