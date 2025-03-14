@@ -112,6 +112,26 @@ BEGIN
     END;
 END;
 
+-- Test 1: Trigger limit_daily_transactions
+-- Insert 3 transactions for the same customer on the same date (should succeed)
+INSERT INTO TRANSACTIONS (TID, ANO, TTYPE, TDATE, TAMOUNT) 
+VALUES (4, 'A003', 'D', '2025-03-11', 1000.00);
+
+INSERT INTO TRANSACTIONS (TID, ANO, TTYPE, TDATE, TAMOUNT) 
+VALUES (5, 'A003', 'W', '2025-03-11', 500.00);
+
+INSERT INTO TRANSACTIONS (TID, ANO, TTYPE, TDATE, TAMOUNT) 
+VALUES (6, 'A004', 'D', '2025-03-11', 200.00);  -- Different account but same customer
+
+-- Try to insert a 4th transaction (should fail)
+INSERT INTO TRANSACTIONS (TID, ANO, TTYPE, TDATE, TAMOUNT) 
+VALUES (7, 'A003', 'D', '2025-03-11', 300.00);
+
+/*
+Result:
+Error: Customer has already performed 3 transactions today
+*/
+
 -- Trigger to update account balance on transaction
 CREATE TRIGGER update_account_balance
 AFTER INSERT ON TRANSACTIONS
@@ -141,28 +161,6 @@ END;
 /*
 Result:
 SQL query successfully executed. However, the result set is empty.
-*/
-
--- Testing
-
--- Test 1: Trigger limit_daily_transactions
--- Insert 3 transactions for the same customer on the same date (should succeed)
-INSERT INTO TRANSACTIONS (TID, ANO, TTYPE, TDATE, TAMOUNT) 
-VALUES (4, 'A003', 'D', '2025-03-11', 1000.00);
-
-INSERT INTO TRANSACTIONS (TID, ANO, TTYPE, TDATE, TAMOUNT) 
-VALUES (5, 'A003', 'W', '2025-03-11', 500.00);
-
-INSERT INTO TRANSACTIONS (TID, ANO, TTYPE, TDATE, TAMOUNT) 
-VALUES (6, 'A004', 'D', '2025-03-11', 200.00);  -- Different account but same customer
-
--- Try to insert a 4th transaction (should fail)
-INSERT INTO TRANSACTIONS (TID, ANO, TTYPE, TDATE, TAMOUNT) 
-VALUES (7, 'A003', 'D', '2025-03-11', 300.00);
-
-/*
-Result:
-Error: Customer has already performed 3 transactions today
 */
     
 -- Test 2: Trigger update_account_balance
