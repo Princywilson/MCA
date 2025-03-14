@@ -1,76 +1,281 @@
-// Assuming you have a MongoDB connection established and databases named 'employeeDB'
 
-// 1. CREATE (Insert) a new department
-db.department.insertOne({
-  DEPT_NO: "D006",
-  NAME: "Sales",
-  MENO: "E006",
-  NOE: 4
+
+// =============================================
+// CREATE OPERATIONS
+// =============================================
+
+// 1. Create collection (if needed)
+db.createCollection("departments");
+db.createCollection("employees");
+
+// Output:
+// { "ok": 1 }
+
+// 2. Insert a single department
+db.departments.insertOne({
+  DEPT_NO: "D001",
+  NAME: "Engineering",
+  MENO: "John Smith",
+  NOE: 15
 });
-// Output: { "acknowledged" : true, "insertedId" : ObjectId("...") }
 
-// CREATE (Insert) a new employee
-db.employee.insertOne({
-  ENO: "E012",
-  NAME: "Alice Johnson",
-  GENDER: "F",
-  DOB: "1992-03-10",
-  DOJ: "2018-01-15",
-  DESIGNATION: "Sales Representative",
-  BASIC: 58000,
-  DEPT_NO: "D004",
-  PANNO: "PAN012",
-  SENO: "E004"
-});
-// Output: { "acknowledged" : true, "insertedId" : ObjectId("...") }
+// Output:
+// {
+//   "acknowledged": true,
+//   "insertedId": ObjectId("607f1f77bcf86cd799439011")
+// }
 
-// 2. READ (Find) all departments
-db.department.find({});
-// Output: [
-//   { DEPT_NO: "D001", NAME: "Human Resources", MENO: "E001", NOE: 2, _id: ObjectId("...") },
-//   { DEPT_NO: "D002", NAME: "Engineering", MENO: "E002", NOE: 3, _id: ObjectId("...") },
-//   ...
-//   { DEPT_NO: "D006", NAME: "Sales", MENO: "E006", NOE: 4, _id: ObjectId("...") }
+// 3. Insert multiple departments
+db.departments.insertMany([
+  { DEPT_NO: "D002", NAME: "Finance", MENO: "Sarah Johnson", NOE: 8 },
+  { DEPT_NO: "D003", NAME: "Marketing", MENO: "David Lee", NOE: 12 }
+]);
+
+// Output:
+// {
+//   "acknowledged": true,
+//   "insertedIds": {
+//     "0": ObjectId("607f1f77bcf86cd799439012"),
+//     "1": ObjectId("607f1f77bcf86cd799439013")
+//   }
+// }
+
+
+// 5. Insert multiple employees at once
+db.employees.insertMany([
+  { 
+    ENO: "E002", 
+    NAME: "Bob Richards", 
+    GENDER: "M", 
+    DOB: "1985-11-23", 
+    DOJ: "2019-07-15", 
+    DESIGNATION: "Financial Analyst", 
+    BASIC: 68000, 
+    DEPT_NO: "D002", 
+    PANNO: "FGHIJ5678K", 
+    SENO: 1002 
+  },
+  { 
+    ENO: "E003", 
+    NAME: "Carol Martinez", 
+    GENDER: "F", 
+    DOB: "1992-03-08", 
+    DOJ: "2021-03-22", 
+    DESIGNATION: "Marketing Specialist", 
+    BASIC: 62000, 
+    DEPT_NO: "D003", 
+    PANNO: "LMNOP9012Q", 
+    SENO: 1003 
+  }
+]);
+
+// Output:
+// {
+//   "acknowledged": true,
+//   "insertedIds": {
+//     "0": ObjectId("607f1f77bcf86cd799439015"),
+//     "1": ObjectId("607f1f77bcf86cd799439016")
+//   }
+// }
+
+// =============================================
+// READ OPERATIONS
+// =============================================
+
+// 1. Find all departments
+db.departments.find();
+
+// Output:
+// [
+//   {
+//     "_id": ObjectId("607f1f77bcf86cd799439011"),
+//     "DEPT_NO": "D001",
+//     "NAME": "Engineering",
+//     "MENO": "John Smith",
+//     "NOE": 15
+//   },
+//   {
+//     "_id": ObjectId("607f1f77bcf86cd799439012"),
+//     "DEPT_NO": "D002",
+//     "NAME": "Finance",
+//     "MENO": "Sarah Johnson",
+//     "NOE": 8
+//   },
+//   {
+//     "_id": ObjectId("607f1f77bcf86cd799439013"),
+//     "DEPT_NO": "D003",
+//     "NAME": "Marketing",
+//     "MENO": "David Lee",
+//     "NOE": 12
+//   }
 // ]
 
+// 2. Find a specific department
+db.departments.findOne({ DEPT_NO: "D001" });
 
-// READ (Find) all employees
-db.employee.find({});
-// Output: [
-//   { ENO: "E001", NAME: "John Smith", GENDER: "M", DOB: "1980-05-15", DOJ: "2010-01-10", DESIGNATION: "HR Manager", BASIC: 85000, DEPT_NO: "D001", PANNO: "PAN001", SENO: "E001", _id: ObjectId("...") },
-//   { ENO: "E002", NAME: "Jane Doe", GENDER: "F", DOB: "1985-08-20", DOJ: "2012-03-15", DESIGNATION: "Senior Engineer", BASIC: 80000, DEPT_NO: "D002", PANNO: "PAN002", SENO: "E002", _id: ObjectId("...") },
-//   ...
-//   { ENO: "E012", NAME: "Alice Johnson", GENDER: "F", DOB: "1992-03-10", DOJ: "2018-01-15", DESIGNATION: "Sales Representative", BASIC: 58000, DEPT_NO: "D004", PANNO: "PAN012", SENO: "E004", _id: ObjectId("...") }
+// Output:
+// {
+//   "_id": ObjectId("607f1f77bcf86cd799439011"),
+//   "DEPT_NO": "D001",
+//   "NAME": "Engineering",
+//   "MENO": "John Smith",
+//   "NOE": 15
+// }
+
+// 3. Find departments with more than 10 employees
+db.departments.find({ NOE: { $gt: 10 } });
+
+// Output:
+// [
+//   {
+//     "_id": ObjectId("607f1f77bcf86cd799439011"),
+//     "DEPT_NO": "D001",
+//     "NAME": "Engineering",
+//     "MENO": "John Smith",
+//     "NOE": 15
+//   },
+//   {
+//     "_id": ObjectId("607f1f77bcf86cd799439013"),
+//     "DEPT_NO": "D003",
+//     "NAME": "Marketing",
+//     "MENO": "David Lee",
+//     "NOE": 12
+//   }
 // ]
 
-// READ (Find) a specific employee by ENO
-db.employee.findOne({ ENO: "E007" });
-// Output: { ENO: "E007", NAME: "David Lee", GENDER: "M", DOB: "1987-09-30", DOJ: "2014-02-15", DESIGNATION: "Software Engineer", BASIC: 75000, DEPT_NO: "D002", PANNO: "PAN007", SENO: "E002", _id: ObjectId("...") }
+// 4. Find and sort employees by salary (descending)
+db.employees.find().sort({ BASIC: -1 });
 
+// Output:
+// [
+//   {
+//     "_id": ObjectId("607f1f77bcf86cd799439014"),
+//     "ENO": "E001",
+//     "NAME": "Alice Cooper",
+//     ...
+//     "BASIC": 75000,
+//     ...
+//   },
+//   {
+//     "_id": ObjectId("607f1f77bcf86cd799439015"),
+//     "ENO": "E002",
+//     ...
+//     "BASIC": 68000,
+//     ...
+//   },
+//   ...
+// ]
 
-// READ (Find) a specific department by DEPT_NO
-db.department.findOne({ DEPT_NO: "D003" });
-// Output: { DEPT_NO: "D003", NAME: "Finance", MENO: "E003", NOE: 2, _id: ObjectId("...") }
+// =============================================
+// UPDATE OPERATIONS
+// =============================================
 
-// 4. UPDATE (Update) the name of a department
-db.department.updateOne(
+// 1. Increase the number of employees in a department
+db.departments.updateOne(
+  { DEPT_NO: "D002" },
+  { $inc: { NOE: 2 } }
+);
+
+// Output:
+// {
+//   "acknowledged": true,
+//   "matchedCount": 1,
+//   "modifiedCount": 1
+// }
+
+// 2. Update salary for all engineers
+db.employees.updateMany(
+  { DESIGNATION: "Software Engineer" },
+  { $mul: { BASIC: 1.1 } }
+);
+
+// Output:
+// {
+//   "acknowledged": true,
+//   "matchedCount": 1,
+//   "modifiedCount": 1
+// }
+
+// 3. Replace an entire employee document
+db.employees.replaceOne(
+  { ENO: "E003" },
+  {
+    ENO: "E003",
+    NAME: "Carol Davidson", // Changed last name
+    GENDER: "F",
+    DOB: "1992-03-08",
+    DOJ: "2021-03-22",
+    DESIGNATION: "Senior Marketing Specialist", // Promotion
+    BASIC: 68000, // Salary increase
+    DEPT_NO: "D003",
+    PANNO: "LMNOP9012Q",
+    SENO: 1003
+  }
+);
+
+// Output:
+// {
+//   "acknowledged": true,
+//   "matchedCount": 1,
+//   "modifiedCount": 1
+// }
+
+// 4. Update with upsert (insert if not exists)
+db.departments.updateOne(
   { DEPT_NO: "D004" },
-  { $set: { NAME: "Marketing and Communications" } }
+  { 
+    $set: { 
+      NAME: "Human Resources", 
+      MENO: "Patricia Wilson", 
+      NOE: 5 
+    } 
+  },
+  { upsert: true }
 );
-// Output: { "acknowledged" : true, "matchedCount" : 1, "modifiedCount" : 1 }
 
-// UPDATE (Update) the designation and basic salary of an employee
-db.employee.updateOne(
-  { ENO: "E008" },
-  { $set: { DESIGNATION: "Senior Financial Analyst", BASIC: 72000 } }
-);
-// Output: { "acknowledged" : true, "matchedCount" : 1, "modifiedCount" : 1 }
+// Output:
+// {
+//   "acknowledged": true,
+//   "matchedCount": 0,
+//   "modifiedCount": 0,
+//   "upsertedCount": 1,
+//   "upsertedId": ObjectId("607f1f77bcf86cd799439017")
+// }
 
-// 5. DELETE (Delete) an employee
-db.employee.deleteOne({ ENO: "E012" });
-// Output: { "acknowledged" : true, "deletedCount" : 1 }
+// =============================================
+// DELETE OPERATIONS
+// =============================================
 
-// DELETE (Delete) a department
-db.department.deleteOne({ DEPT_NO: "D006" });
-// Output: { "acknowledged" : true, "deletedCount" : 1 }
+// 1. Delete a department
+db.departments.deleteOne({ DEPT_NO: "D003" });
+
+// Output:
+// {
+//   "acknowledged": true,
+//   "deletedCount": 1
+// }
+
+// 2. Delete all employees of a specific department
+db.employees.deleteMany({ DEPT_NO: "D002" });
+
+// Output:
+// {
+//   "acknowledged": true,
+//   "deletedCount": 1
+// }
+
+// 3. Delete employees who joined before 2020
+db.employees.deleteMany({ DOJ: { $lt: "2020-01-01" } });
+
+// Output:
+// {
+//   "acknowledged": true,
+//   "deletedCount": 1
+// }
+
+// 4. Remove a collection entirely
+db.employees.drop();
+
+// Output:
+// true
 
