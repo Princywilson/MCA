@@ -90,17 +90,16 @@ db.customer.updateOne(
 // Output/Result:
 // { "acknowledged" : true, "matchedCount" : 1, "modifiedCount" : 1 }
 
-db.Employee.updateMany(
-  { DEPT_NO: "D003" },
-  { $mul: { BASIC: 1.1 } }
+
+db.account.updateMany(
+  { ATYPE: "C" },
+  { $inc: { BALANCE: 100 } }
 )
 
+
 // Output:
-// {
-//   "acknowledged": true,
-//   "matchedCount": 1,
-//   "modifiedCount": 1
-// }
+// { "acknowledged" : true, "matchedCount" : 2, "modifiedCount" : 2 }
+
 
 
 // --- DELETE Operations ---
