@@ -138,4 +138,4 @@ myTree.printHelper(startingvalue, "", True)
 k = 30
 startingvalue = myTree.delete_n(startingvalue, k)
 print("After Deletion: ")
-myTree.printHelper(startingvalue, "", True)AVL T
+myTree.printHelper(startingvalue, "", True)
