@@ -141,3 +141,4 @@ if __name__ == '__main__':
     spl.insert(P7)
     spl.insert(P8)
     spl.inorder(spl.root)
+    
