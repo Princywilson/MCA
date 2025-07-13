@@ -34,10 +34,69 @@
       text-align: center;
       margin-top: 15px;
     }
+
+    /* --- Added styles for tabs and records --- */
+    .tabs {
+      width: 520px;
+      margin: 30px auto 10px;
+      display: flex;
+      cursor: pointer;
+      user-select: none;
+    }
+    .tab {
+      flex: 1;
+      padding: 10px;
+      background: #eee;
+      border: 1px solid #ccc;
+      border-bottom: none;
+      text-align: center;
+      font-weight: bold;
+      border-radius: 5px 5px 0 0;
+    }
+    .tab.active {
+      background: white;
+      border-bottom: 1px solid white;
+    }
+    #recordsView {
+      width: 520px;
+      margin: auto;
+      border: 1px solid #ccc;
+      border-radius: 0 0 5px 5px;
+      padding: 15px;
+      box-shadow: 5px 5px 2px #888;
+      display: none;
+      background: white;
+    }
+    #recordsTable {
+      width: 100%;
+      border-collapse: collapse;
+    }
+    #recordsTable th, #recordsTable td {
+      border: 1px solid #ccc;
+      padding: 8px;
+      text-align: left;
+    }
+    #recordsTable th {
+      background: #f4f4f4;
+    }
+    #noRecords {
+      text-align: center;
+      margin-top: 10px;
+      font-style: italic;
+      color: #555;
+    }
 </style>
 </head>
 <body>
-<form method="post" target="#" onsubmit="return validate()">
+
+<!-- Tabs -->
+<div class="tabs">
+  <div class="tab active" id="tabForm">Registration Form</div>
+  <div class="tab" id="tabRecords">Registered Records</div>
+</div>
+
+<!-- Your original form (no changes) -->
+<form method="post" target="#" onsubmit="return handleSubmit(event)" id="registrationForm">
 <h1>Event Registration Form</h1>
 Name<br>
 <input type="text" name="name"><br>
@@ -60,7 +119,49 @@ Retype password<br>
 </div>
 </form>
 
+<!-- Registered records view -->
+<div id="recordsView">
+  <h2>Registered Participants</h2>
+  <table id="recordsTable" aria-label="Registered Participants Table">
+    <thead>
+      <tr>
+        <th>Name</th>
+        <th>Email</th>
+      </tr>
+    </thead>
+    <tbody id="recordsBody">
+      <!-- registrations will appear here -->
+    </tbody>
+  </table>
+  <p id="noRecords">No registrations yet.</p>
+</div>
+
 <script>
+// --- Tab switching ---
+const tabForm = document.getElementById('tabForm');
+const tabRecords = document.getElementById('tabRecords');
+const formEl = document.getElementById('registrationForm');
+const recordsView = document.getElementById('recordsView');
+
+tabForm.addEventListener('click', () => {
+  tabForm.classList.add('active');
+  tabRecords.classList.remove('active');
+  formEl.style.display = 'block';
+  recordsView.style.display = 'none';
+});
+
+tabRecords.addEventListener('click', () => {
+  tabRecords.classList.add('active');
+  tabForm.classList.remove('active');
+  formEl.style.display = 'none';
+  recordsView.style.display = 'block';
+  updateRecordsTable();
+});
+
+// --- Store registrations here ---
+const registrations = [];
+
+// --- Validation functions unchanged ---
 function validate() {
   var result = "";
   result += validateName();
@@ -83,8 +184,6 @@ function validateName() {
 
   return "";
 }
-
-
 function validatePassword() {
   var password = valueOf("password");
   var retype = valueOf("retype_password");
@@ -93,7 +192,6 @@ function validatePassword() {
   if (password != retype) return "Passwords do not match.\n";
   return "";
 }
-
 function validateEmail() {
   var email = valueOf("email");
   var retype = valueOf("retype_email");
@@ -103,16 +201,55 @@ function validateEmail() {
     return "Email addresses do not match.\n";
   return "";
 }
-
 function validateTerms() {
   var terms = document.getElementsByName("terms")[0];
   if (!terms.checked)
     return "Please accept the Terms of Service and Privacy Policy.\n";
   return "";
 }
-
 function valueOf(name) {
   return document.getElementsByName(name)[0].value;
+}
+
+// --- Handle form submission ---
+function handleSubmit(event) {
+  event.preventDefault();
+  if (!validate()) return false;
+
+  // Gather data
+  const name = valueOf("name");
+  const email = valueOf("email");
+
+  // Save registration
+  registrations.push({ name, email });
+
+  // Reset form
+  event.target.reset();
+
+  // Switch to records tab and update table
+  tabRecords.click();
+
+  return false;
+}
+
+// --- Update records table ---
+function updateRecordsTable() {
+  const tbody = document.getElementById('recordsBody');
+  const noRecords = document.getElementById('noRecords');
+  tbody.innerHTML = "";
+
+  if (registrations.length === 0) {
+    noRecords.style.display = 'block';
+    return;
+  }
+
+  noRecords.style.display = 'none';
+
+  registrations.forEach(reg => {
+    const tr = document.createElement('tr');
+    tr.innerHTML = `<td>${reg.name}</td><td>${reg.email}</td>`;
+    tbody.appendChild(tr);
+  });
 }
 </script>
 </body>
