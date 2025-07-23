@@ -1,4 +1,23 @@
+# 💡 What Do These Programs Do?
 
+# Listing 7 (Agent)
+# Implements a simple Mine Field Agent that can move within a 4x4 grid.
+# Some cells have hidden mines ('M').
+# The agent:
+# Starts at [1,1] and must avoid mines.
+# Can sense how many adjacent rooms contain mines (=0, =1, >1).
+# Keeps track of whether it is alive or dead, and whether it has exited safely.
+
+# Listing 8 (mine_field.py)
+# Builds a logical reasoning layer on top of the agent using SAT logic (via pysat).
+# Uses percept data to infer safe or unsafe cells logically.
+# Guides the agent to safely explore the minefield, using:
+# Logical clause generation from percepts.
+# Depth-first search for path planning.
+# SAT solver (Glucose3) to deduce safe cells.
+
+# Install pysat before running Mine_field.py file
+# pip install "python-sat[pblib,aiger]"
 
 # -*- coding: utf-8 -*-
 class Agent:
