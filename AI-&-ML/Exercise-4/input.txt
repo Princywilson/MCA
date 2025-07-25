@@ -1,0 +1,7 @@
+2
+~Ancestor(Bob,John)
+Ancestor(Bob,John)
+3
+Ancestor(x,y)=>Parent(x,y)
+Parent(John,Bob)
+~Parent(x,y)|Ancestor(x,y)
