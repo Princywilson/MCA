@@ -10,7 +10,7 @@ import queue
 
 start_time = time.time()
 
-p = open("./input.txt", "r")
+p = open("./input2.txt", "r")
 data1 = p.readlines()
 n = int(data1[0])
 queries = [data1[i].rstrip() for i in range(1, n + 1)]
