@@ -1,3 +1,6 @@
+# Need to install few things
+
+
 # −*− coding: utf−8 −*−
 import numpy as np
 import pandas as pd
