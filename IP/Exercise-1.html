@@ -1,256 +1,139 @@
 <!DOCTYPE html>
 <html>
 <head>
-<title>Registration Form</title>
-<style>
+  <title>Event Registration</title>
+  <style>
     body {
-      font-family: Verdana, sans-serif;
+      font-family: Arial;
+      margin: 20px;
     }
-    input {
-      border-radius: 5px;
-      padding: 5px;
-      margin-bottom: 10px;
-      width: 95%;
-    }
-    div.button {
-      text-align: right;
-    }
-    a {
-      text-decoration: none;
-      color: #e51;
-    }
-    form {
-      width: 480px;
-      margin: auto;
-      padding: 15px;
-      border: solid black 1px;
-      border-radius: 5px;
-      box-shadow: 5px 5px 2px #888;
-    }
-    #thanksMessage {
-      display: none;
-      color: green;
-      font-weight: bold;
-      text-align: center;
-      margin-top: 15px;
-    }
-
-    /* --- Added styles for tabs and records --- */
-    .tabs {
-      width: 520px;
-      margin: 30px auto 10px;
-      display: flex;
-      cursor: pointer;
-      user-select: none;
+    button {
+      padding: 8px;
+      margin-right: 5px;
     }
     .tab {
-      flex: 1;
-      padding: 10px;
-      background: #eee;
-      border: 1px solid #ccc;
-      border-bottom: none;
-      text-align: center;
-      font-weight: bold;
-      border-radius: 5px 5px 0 0;
-    }
-    .tab.active {
-      background: white;
-      border-bottom: 1px solid white;
-    }
-    #recordsView {
-      width: 520px;
-      margin: auto;
-      border: 1px solid #ccc;
-      border-radius: 0 0 5px 5px;
-      padding: 15px;
-      box-shadow: 5px 5px 2px #888;
       display: none;
-      background: white;
+      margin-top: 20px;
     }
-    #recordsTable {
-      width: 100%;
+    table, th, td {
+      border: 1px solid black;
       border-collapse: collapse;
-    }
-    #recordsTable th, #recordsTable td {
-      border: 1px solid #ccc;
       padding: 8px;
-      text-align: left;
-    }
-    #recordsTable th {
-      background: #f4f4f4;
-    }
-    #noRecords {
       text-align: center;
-      margin-top: 10px;
-      font-style: italic;
-      color: #555;
     }
-</style>
+  </style>
 </head>
+
 <body>
 
+<h2>Event Registration Application</h2>
+
 <!-- Tabs -->
-<div class="tabs">
-  <div class="tab active" id="tabForm">Registration Form</div>
-  <div class="tab" id="tabRecords">Registered Records</div>
+<button onclick="showTab('register')">Register</button>
+<button onclick="showTab('view')">View Records</button>
+
+<!-- Registration Form -->
+<div id="register" class="tab">
+  <h3>Register Event</h3>
+
+  <form onsubmit="registerUser(); return false;">
+    Name:<br>
+    <input type="text" id="name"><br><br>
+
+    Phone No:<br>
+    <input type="text" id="phone"><br><br>
+
+    Email:<br>
+    <input type="text" id="email"><br><br>
+
+    Address:<br>
+    <textarea id="address"></textarea><br><br>
+
+    <button type="submit">Register</button>
+  </form>
+
+  <p id="msg" style="color:red;"></p>
 </div>
 
-<!-- Your original form (no changes) -->
-<form method="post" target="#" onsubmit="return handleSubmit(event)" id="registrationForm">
-<h1>Event Registration Form</h1>
-Name<br>
-<input type="text" name="name"><br>
-Email<br>
-<input type="text" name="email"><br>
-Retype email<br>
-<input type="text" name="retype_email"><br>
-Create a password<br>
-<input type="password" name="password"><br>
-Retype password<br>
-<input type="password" name="retype_password"><br>
-<label>
-  <input type="checkbox" name="terms">By signing up this registration form
-  you agree to your
-  <a href="#service">Terms of Service</a> and <a href="#policy">Privacy
-  Policy</a>
-</label>
-<div class="button">
-  <input type="submit" class="button" value="Set Up Account">
-</div>
-</form>
-
-<!-- Registered records view -->
-<div id="recordsView">
-  <h2>Registered Participants</h2>
-  <table id="recordsTable" aria-label="Registered Participants Table">
-    <thead>
-      <tr>
-        <th>Name</th>
-        <th>Email</th>
-      </tr>
-    </thead>
-    <tbody id="recordsBody">
-      <!-- registrations will appear here -->
-    </tbody>
+<!-- View Records -->
+<div id="view" class="tab">
+  <h3>Registered Users</h3>
+  <table width="100%">
+    <tr>
+      <th>Name</th>
+      <th>Phone</th>
+      <th>Email</th>
+      <th>Address</th>
+    </tr>
+    <tbody id="records"></tbody>
   </table>
-  <p id="noRecords">No registrations yet.</p>
 </div>
 
 <script>
-// --- Tab switching ---
-const tabForm = document.getElementById('tabForm');
-const tabRecords = document.getElementById('tabRecords');
-const formEl = document.getElementById('registrationForm');
-const recordsView = document.getElementById('recordsView');
+  let users = [];
 
-tabForm.addEventListener('click', () => {
-  tabForm.classList.add('active');
-  tabRecords.classList.remove('active');
-  formEl.style.display = 'block';
-  recordsView.style.display = 'none';
-});
-
-tabRecords.addEventListener('click', () => {
-  tabRecords.classList.add('active');
-  tabForm.classList.remove('active');
-  formEl.style.display = 'none';
-  recordsView.style.display = 'block';
-  updateRecordsTable();
-});
-
-// --- Store registrations here ---
-const registrations = [];
-
-// --- Validation functions unchanged ---
-function validate() {
-  var result = "";
-  result += validateName();
-  result += validateEmail();
-  result += validatePassword();
-  result += validateTerms();
-  if (result == "") return true;
-  alert("Validation Result:\n\n" + result);
-  return false;
-}
-function validateName() {
-  var name = document.getElementsByName("name")[0].value;
-  if (name.length < 3)
-    return "Name should be at least three characters.\n";
-
-  // Check if name contains only alphabets (A-Z and a-z)
-  var alphaRegex = /^[A-Za-z]+$/;
-  if (!alphaRegex.test(name))
-    return "Name should contain only alphabets.\n";
-
-  return "";
-}
-function validatePassword() {
-  var password = valueOf("password");
-  var retype = valueOf("retype_password");
-  if (password.length < 6)
-    return "Password should be at least 6 characters.\n";
-  if (password != retype) return "Passwords do not match.\n";
-  return "";
-}
-function validateEmail() {
-  var email = valueOf("email");
-  var retype = valueOf("retype_email");
-  if (email.indexOf('@') == -1)
-    return "Email should be a valid address.\n";
-  if (email != retype)
-    return "Email addresses do not match.\n";
-  return "";
-}
-function validateTerms() {
-  var terms = document.getElementsByName("terms")[0];
-  if (!terms.checked)
-    return "Please accept the Terms of Service and Privacy Policy.\n";
-  return "";
-}
-function valueOf(name) {
-  return document.getElementsByName(name)[0].value;
-}
-
-// --- Handle form submission ---
-function handleSubmit(event) {
-  event.preventDefault();
-  if (!validate()) return false;
-
-  // Gather data
-  const name = valueOf("name");
-  const email = valueOf("email");
-
-  // Save registration
-  registrations.push({ name, email });
-
-  // Reset form
-  event.target.reset();
-
-  // Switch to records tab and update table
-  tabRecords.click();
-
-  return false;
-}
-
-// --- Update records table ---
-function updateRecordsTable() {
-  const tbody = document.getElementById('recordsBody');
-  const noRecords = document.getElementById('noRecords');
-  tbody.innerHTML = "";
-
-  if (registrations.length === 0) {
-    noRecords.style.display = 'block';
-    return;
+  function showTab(tab) {
+    document.getElementById("register").style.display = "none";
+    document.getElementById("view").style.display = "none";
+    document.getElementById(tab).style.display = "block";
   }
 
-  noRecords.style.display = 'none';
+  function registerUser() {
+    let name = document.getElementById("name").value;
+    let phone = document.getElementById("phone").value;
+    let email = document.getElementById("email").value;
+    let address = document.getElementById("address").value;
+    let msg = document.getElementById("msg");
 
-  registrations.forEach(reg => {
-    const tr = document.createElement('tr');
-    tr.innerHTML = `<td>${reg.name}</td><td>${reg.email}</td>`;
-    tbody.appendChild(tr);
-  });
-}
+    // Validation
+    if (name === "" || phone === "" || email === "" || address === "") {
+      msg.innerText = "All fields are required";
+      return;
+    }
+
+    if (phone.length !== 10 || isNaN(phone)) {
+      msg.innerText = "Phone number must be 10 digits";
+      return;
+    }
+
+    if (!email.includes("@") || !email.includes(".")) {
+      msg.innerText = "Invalid email format";
+      return;
+    }
+
+    // Store data
+    users.push({ name, phone, email, address });
+
+    msg.style.color = "green";
+    msg.innerText = "Registration Successful";
+
+    document.getElementById("name").value = "";
+    document.getElementById("phone").value = "";
+    document.getElementById("email").value = "";
+    document.getElementById("address").value = "";
+
+    showRecords();
+  }
+
+  function showRecords() {
+    let table = document.getElementById("records");
+    table.innerHTML = "";
+
+    users.forEach(user => {
+      table.innerHTML += `
+        <tr>
+          <td>${user.name}</td>
+          <td>${user.phone}</td>
+          <td>${user.email}</td>
+          <td>${user.address}</td>
+        </tr>
+      `;
+    });
+  }
+
+  // Default tab
+  showTab("register");
 </script>
+
 </body>
 </html>
