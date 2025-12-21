@@ -18,51 +18,15 @@ Email:
 <h3>Registered Users</h3>
 <ul id="list"></ul>
 
-<script type="module">
-  import { Registration, RegistrationService } from "./app.js";
-
-  function register() {
-    let name = document.getElementById("name").value;
-    let email = document.getElementById("email").value;
-
-    if (name === "" || email === "") {
-      alert("All fields required");
-      return;
-    }
-
-    let user = new Registration(name, email);
-    RegistrationService.save(user);
-    showUsers();
-  }
-
-  function showUsers() {
-    let users = RegistrationService.getAll();
-    let list = document.getElementById("list");
-    list.innerHTML = "";
-
-    users.forEach(u => {
-      let li = document.createElement("li");
-      li.innerText = u.name + " - " + u.email;
-      list.appendChild(li);
-    });
-  }
-
-  showUsers();
-  window.register = register;
-</script>
-
-</body>
 <script>
-// app.js
-
-export class Registration {
+class Registration {
   constructor(name, email) {
     this.name = name;
     this.email = email;
   }
 }
 
-export class RegistrationService {
+class RegistrationService {
   static save(user) {
     let users = JSON.parse(localStorage.getItem("users")) || [];
     users.push(user);
@@ -73,5 +37,40 @@ export class RegistrationService {
     return JSON.parse(localStorage.getItem("users")) || [];
   }
 }
+
+function register() {
+  let name = document.getElementById("name").value;
+  let email = document.getElementById("email").value;
+
+  if (name === "" || email === "") {
+    alert("All fields required");
+    return;
+  }
+
+  let user = new Registration(name, email);
+  RegistrationService.save(user);
+  showUsers();
+
+  // Optional: clear inputs after register
+  document.getElementById("name").value = "";
+  document.getElementById("email").value = "";
+}
+
+function showUsers() {
+  let users = RegistrationService.getAll();
+  let list = document.getElementById("list");
+  list.innerHTML = "";
+
+  users.forEach(u => {
+    let li = document.createElement("li");
+    li.innerText = u.name + " - " + u.email;
+    list.appendChild(li);
+  });
+}
+
+// Load saved users on page refresh
+showUsers();
 </script>
+
+</body>
 </html>
