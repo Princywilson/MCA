@@ -1,0 +1,229 @@
+This project is a classic MERN stack (MongoDB, Express, React, Node.js) application. Since your lab content includes both backend (Models, Routes, Server) and frontend (App.js, Components) code, you need to set up two folders to run this successfully.
+
+I have cleaned the syntax (fixing curly quotes ‘ to straight quotes ' and removing page numbers like 71, 72 that were in your text) so the code is actually runnable.
+
+1. The Complete Workable Code
+Backend Structure (Folder: backend/)
+models/exercise.model.js
+
+JavaScript
+const mongoose = require('mongoose');
+const Schema = mongoose.Schema;
+
+const exerciseSchema = new Schema({
+  username: { type: String, required: true },
+  description: { type: String, required: true },
+  duration: { type: Number, required: true },
+  date: { type: Date, required: true },
+}, {
+  timestamps: true,
+});
+
+const Exercise = mongoose.model('Exercise', exerciseSchema);
+module.exports = Exercise;
+models/user.model.js
+
+JavaScript
+const mongoose = require('mongoose');
+const Schema = mongoose.Schema;
+
+const userSchema = new Schema({
+  username: {
+    type: String,
+    required: true,
+    unique: true,
+    trim: true,
+    minlength: 3
+  },
+}, {
+  timestamps: true,
+});
+
+const User = mongoose.model('User', userSchema);
+module.exports = User;
+routes/exercises.js
+
+JavaScript
+const router = require('express').Router();
+let Exercise = require('../models/exercise.model');
+
+router.route('/').get((req, res) => {
+  Exercise.find()
+    .then(exercises => res.json(exercises))
+    .catch(err => res.status(400).json('Error:' + err));
+});
+
+router.route('/add').post((req, res) => {
+  const username = req.body.username;
+  const description = req.body.description;
+  const duration = Number(req.body.duration);
+  const date = Date.parse(req.body.date);
+
+  const newExercise = new Exercise({
+    username,
+    description,
+    duration,
+    date,
+  });
+
+  newExercise.save()
+    .then(() => res.json('Exercise added..!!!'))
+    .catch(err => res.status(400).json('Error :' + err));
+});
+
+router.route('/:id').get((req, res) => {
+  Exercise.findById(req.params.id)
+    .then(exercise => res.json(exercise))
+    .catch(err => res.status(400).json('Error' + err));
+});
+
+router.route('/:id').delete((req, res) => {
+  Exercise.findByIdAndDelete(req.params.id)
+    .then(() => res.json('Exercise deleted..'))
+    .catch(err => res.status(400).json('Error' + err));
+});
+
+router.route('/update/:id').post((req, res) => {
+  Exercise.findById(req.params.id)
+    .then(exercise => {
+      exercise.username = req.body.username;
+      exercise.description = req.body.description;
+      exercise.duration = Number(req.body.duration);
+      exercise.date = Date.parse(req.body.date);
+
+      exercise.save()
+        .then(() => res.json('Exercise updated'))
+        .catch(err => res.status(400).json('Error:' + err));
+    })
+    .catch(err => res.status(400).json('Error' + err));
+});
+
+module.exports = router;
+routes/users.js
+
+JavaScript
+const router = require('express').Router();
+let User = require('../models/user.model');
+
+router.route('/').get((req, res) => {
+  User.find()
+    .then(users => res.json(users))
+    .catch(err => res.status(400).json('Error: ' + err));
+});
+
+router.route('/add').post((req, res) => {
+  const username = req.body.username;
+  const newUser = new User({ username });
+
+  newUser.save()
+    .then(() => res.json('User added !'))
+    .catch(err => res.status(400).json('Error: ' + err));
+});
+
+module.exports = router;
+server.js
+
+JavaScript
+const express = require('express');
+const cors = require('cors');
+const mongoose = require('mongoose');
+
+require('dotenv').config();
+
+const app = express();
+const port = process.env.PORT || 5000;
+
+app.use(cors());
+app.use(express.json());
+
+const uri = process.env.ATLAS_URI;
+mongoose.connect(uri, { useNewUrlParser: true, useUnifiedTopology: true });
+
+const connection = mongoose.connection;
+connection.once('open', () => {
+  console.log("connected to MongoDB");
+})
+
+const exerciseRouter = require('./routes/exercises');
+const userRouter = require('./routes/users');
+
+app.use('/exercises', exerciseRouter);
+app.use('/users', userRouter);
+
+app.listen(port, () => {
+  console.log(`Server is listening at port : ${port}`);
+});
+Frontend Structure (Folder: src/)
+App.js
+
+JavaScript
+import React from 'react';
+import { BrowserRouter as Router, Route } from 'react-router-dom'; 
+import "bootstrap/dist/css/bootstrap.min.css";
+
+import Navbar from "./components/navabar.component";
+import ExercisesList from "./components/exercises-list.component";
+import EditExercise from "./components/edit-exercise.component";
+import CreateExercise from "./components/create-exercise.component"; 
+import CreateUser from "./components/create-user.component"; 
+
+function App() {
+  return (
+    <Router>
+      <div className="container">
+        <Navbar />
+        <br/>
+        <Route path="/" exact component={ExercisesList} />
+        <Route path="/edit/:id" component={EditExercise} />
+        <Route path="/create" component={CreateExercise} />
+        <Route path="/user" component={CreateUser} />
+      </div>
+    </Router>
+  );
+}
+
+export default App;
+2. Step-by-Step Instructions (VS Code)
+Phase 1: Prerequisites
+Node.js: Ensure Node.js is installed (node -v in terminal).
+
+MongoDB: You need a MongoDB connection string. You can get a free one at MongoDB Atlas.
+
+Phase 2: Backend Setup
+Open VS Code and create a folder named exercise-tracker.
+
+Open the terminal in VS Code and type:
+
+Bash
+mkdir backend
+cd backend
+npm init -y
+npm install express cors mongoose dotenv
+Create the folders models and routes inside backend.
+
+Create the files listed in the Backend section above and paste the code.
+
+Important: Create a file named .env in the backend folder and add your MongoDB URI:
+
+Plaintext
+ATLAS_URI=mongodb+srv://<your_username>:<your_password>@cluster0.mongodb.net/myFirstDatabase?retryWrites=true&w=majority
+Run the server: node server.js. You should see "connected to MongoDB".
+
+Phase 3: Frontend Setup
+Open a new terminal window in VS Code.
+
+Go back to the root exercise-tracker folder and run:
+
+Bash
+npx create-react-app client
+cd client
+npm install axios react-router-dom@5 bootstrap
+(Note: Using react-router-dom version 5 to match your provided code syntax).
+
+Go to src/App.js and paste the code provided above.
+
+Create a components folder inside src. You will need to create the component files (Navbar, ExercisesList, etc.) mentioned in the imports for the app to fully render.
+
+Run the frontend: npm start.
+
+Would you like me to generate the code for the missing React component files (like navbar.component.js) so the application is fully functional?
