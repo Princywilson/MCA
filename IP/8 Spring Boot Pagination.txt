@@ -1,0 +1,215 @@
+Good luck with your lab examination! It's smart to get this running locally ahead of time.
+
+I have cleaned up the code from your e-content (fixing the "curly quotes" from the PDF and the stray page numbers like 67 and 68 that would cause errors) and organized it into the correct folder structure for a Spring Boot project.
+
+1. Complete Workable Code
+Since this is a Spring Boot project, you need a pom.xml to manage dependencies (Lombok, Spring Data JPA, H2 Database, and Web).
+
+File 1: pom.xml
+Create this in the root folder of your project.
+
+XML
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<parent>
+		<groupId>org.springframework.boot</groupId>
+		<artifactId>spring-boot-starter-parent</artifactId>
+		<version>2.7.15</version>
+		<relativePath/>
+	</parent>
+	<groupId>com.lynas</groupId>
+	<artifactId>paginationandsorting</artifactId>
+	<version>0.0.1-SNAPSHOT</version>
+	<name>paginationandsorting</name>
+
+	<properties>
+		<java.version>11</java.version>
+	</properties>
+
+	<dependencies>
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-data-jpa</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-web</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>com.h2database</groupId>
+			<artifactId>h2</artifactId>
+			<scope>runtime</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.projectlombok</groupId>
+			<artifactId>lombok</artifactId>
+			<optional>true</optional>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-test</artifactId>
+			<scope>test</scope>
+		</dependency>
+	</dependencies>
+
+	<build>
+		<plugins>
+			<plugin>
+				<groupId>org.springframework.boot</groupId>
+				<artifactId>spring-boot-maven-plugin</artifactId>
+			</plugin>
+		</plugins>
+	</build>
+</project>
+File 2: PaginationAndSortingApplication.java
+Path: src/main/java/com/lynas/paginationandsorting/PaginationAndSortingApplication.java
+
+Java
+package com.lynas.paginationandsorting;
+
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+import lombok.RequiredArgsConstructor;
+import org.springframework.boot.CommandLineRunner;
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.context.annotation.Bean;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
+
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.Id;
+import java.util.Optional;
+
+@SpringBootApplication
+public class PaginationAndSortingApplication {
+
+    public static void main(String[] args) {
+        SpringApplication.run(PaginationAndSortingApplication.class, args);
+    }
+
+    @Bean
+    public CommandLineRunner init(StudentRepository repository) {
+        return args -> {
+            repository.save(new Student(null, "sazzad", "one", 1995));
+            repository.save(new Student(null, "Rony", "one", 1993));
+            repository.save(new Student(null, "Naim", "one", 1996));
+            repository.save(new Student(null, "Dania", "one", 1995));
+            repository.save(new Student(null, "Mamun", "one", 1993));
+            repository.save(new Student(null, "Rimi", "one", 1995));
+            repository.save(new Student(null, "Habib", "two", 1991));
+            repository.save(new Student(null, "Shail", "two", 1999));
+            repository.save(new Student(null, "Pranjol", "two", 1998));
+            repository.save(new Student(null, "Shohag", "two", 1992));
+            repository.save(new Student(null, "Ramjan", "two", 1993));
+            repository.save(new Student(null, "Ashik", "two", 1996));
+            repository.save(new Student(null, "Kibria", "two", 1995));
+            repository.save(new Student(null, "Aurik", "three", 1997));
+            repository.save(new Student(null, "Tanvir", "three", 1998));
+            repository.save(new Student(null, "Nazmul", "three", 1995));
+            repository.save(new Student(null, "Mizan", "three", 1996));
+            repository.save(new Student(null, "Anik", "three", 1998));
+            repository.save(new Student(null, "Mehedi", "three", 1997));
+            repository.save(new Student(null, "Shahadat", "four", 1999));
+            repository.save(new Student(null, "Dipak", "four", 1995));
+            repository.save(new Student(null, "Mukta", "four", 1997));
+            repository.save(new Student(null, "Rabaet", "four", 1997));
+            repository.save(new Student(null, "Lopa", "four", 1995));
+            repository.save(new Student(null, "Markes", "five", 1997));
+            repository.save(new Student(null, "Valentino", "five", 1996));
+            repository.save(new Student(null, "Fotik", "five", 1991));
+            repository.save(new Student(null, "Lubna", "five", 1992));
+        };
+    }
+}
+
+@Data
+@AllArgsConstructor
+@NoArgsConstructor
+@Entity
+class Student {
+    @Id
+    @GeneratedValue
+    private Long id;
+    private String name;
+    private String course;
+    private int admissionYear;
+}
+
+interface StudentRepository extends JpaRepository<Student, Long> {
+    @Query("select s from Student s where name like %?1%")
+    Page<Student> findByName(String name, Pageable pageable);
+}
+
+@RestController
+@RequiredArgsConstructor
+class StudentController {
+    private final StudentRepository repository;
+
+    @GetMapping("/students")
+    public Page<Student> findAll(
+            @RequestParam Optional<String> name,
+            @RequestParam Optional<Integer> page,
+            @RequestParam Optional<String> sortBy) {
+        
+        return repository.findByName(name.orElse("_"),
+                PageRequest.of(
+                        page.orElse(0), 5,
+                        Sort.Direction.ASC, sortBy.orElse("id")));
+    }
+}
+2. Step-by-Step Instructions for VS Code
+Prerequisites
+Java JDK (11 or 17) installed.
+
+VS Code installed.
+
+Extensions for VS Code:
+
+Extension Pack for Java (by Microsoft)
+
+Spring Boot Extension Pack (by VMware)
+
+Lombok Annotations Support
+
+Steps to Run
+Create Project Folder: Open a new folder in VS Code (e.g., SpringLab).
+
+Setup Folder Structure: Create the following directory path inside your folder: src/main/java/com/lynas/paginationandsorting/
+
+Create Files:
+
+Place the pom.xml in the main folder (SpringLab).
+
+Place PaginationAndSortingApplication.java inside the paginationandsorting folder.
+
+Import Project: VS Code should detect the pom.xml and ask to import the project. Click Yes or Allow.
+
+Run the Application:
+
+Open PaginationAndSortingApplication.java.
+
+Click the Run button that appears above the main method, or press F5.
+
+Test the REST API: Open your browser and try these URLs:
+
+Get all (paginated): http://localhost:8080/students
+
+Search for name "Rony": http://localhost:8080/students?name=Rony
+
+Go to page 2: http://localhost:8080/students?page=1
+
+Sort by Name: http://localhost:8080/students?sortBy=name
+
+Would you like me to explain how the PageRequest and Pageable objects work together to handle the database query?
