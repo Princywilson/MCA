@@ -1,0 +1,168 @@
+Preparing for a lab exam can be stressful, but getting a solid Hibernate/JPA project running is a great way to understand how Java interacts with databases.
+
+The code you provided contains several "scanned" artifacts (like page numbers "63", "64", and curly quotes “ ”) which would normally cause errors. I have cleaned these up to ensure the code is runnable while strictly maintaining the logic and structure you provided.
+
+1. The Complete Workable Code
+Since you are using javax.persistence and hibernate.cfg.xml, I have organized this into a standard Maven-style structure.
+
+Employee.java
+Java
+package Proj;
+
+import javax.persistence.*;
+
+@Entity
+@Table(name="employee")
+public class Employee {
+    @Id
+    @GeneratedValue(strategy=GenerationType.AUTO)
+    @Column(name = "id")
+    private int id;
+
+    @Column(name="email")
+    private String email;
+
+    @Column(name="name")
+    private String name;
+
+    @OneToOne
+    @JoinColumn(name="ACCOUNT_ID", referencedColumnName = "id")
+    private Account account;
+
+    public int getId() { return id; }
+    public void setId(int id) { this.id = id; }
+
+    public String getName() { return name; }
+    public void setName(String name) { this.name = name; }
+
+    public String getEmail() { return email; }
+    public void setEmail(String email) { this.email = email; }
+
+    public Account getAccount() { return account; }
+    public void setAccount(Account account) { this.account = account; }
+}
+Account.java
+Java
+package Proj;
+
+import javax.persistence.*;
+
+@Entity
+@Table(name="account")
+public class Account {
+    @Id
+    @GeneratedValue(strategy = GenerationType.AUTO)
+    @Column(name = "id")
+    private int id;
+
+    @Column(name="accno")
+    private String accno;
+
+    @OneToOne(mappedBy="account")
+    private Employee employee;
+
+    public int getId() { return id; }
+    public void setId(int id) { this.id = id; }
+
+    public String getAccno() { return accno; }
+    public void setAccno(String accno) { this.accno = accno; }
+
+    public Employee getEmployee() { return employee; }
+    public void setEmployee(Employee employee) { this.employee = employee; }
+}
+Clientruncode.java
+Java
+package Proj;
+
+import org.hibernate.*;
+import org.hibernate.boot.Metadata;
+import org.hibernate.boot.MetadataSources;
+import org.hibernate.boot.registry.StandardServiceRegistry;
+import org.hibernate.boot.registry.StandardServiceRegistryBuilder;
+
+public class Clientruncode {
+    public static void main(String[] args) {
+        StandardServiceRegistry ssr = new StandardServiceRegistryBuilder()
+                .configure("hibernate.cfg.xml").build();
+
+        Metadata meta = new MetadataSources(ssr).getMetadataBuilder().build();
+        SessionFactory factory = meta.getSessionFactoryBuilder().build();
+        Session session = factory.openSession();
+        Transaction t = session.beginTransaction();
+
+        Account account = new Account();
+        account.setAccno("123-345-65495");
+
+        Employee emp = new Employee();
+        emp.setEmail("john@gmail.com");
+        emp.setName("userjohn");
+
+        // Saving entities
+        session.saveOrUpdate(account);
+        emp.setAccount(account);
+        session.saveOrUpdate(emp);
+
+        t.commit();
+        System.out.println("Successfully saved Employee and Account!");
+        session.close();
+        factory.close();
+    }
+}
+2. Step-by-Step Instructions for VS Code
+To run this, you need to set up a Java Project with the Hibernate libraries and a MySQL database (or H2 for simplicity).
+
+Step 1: Set up the Project Structure
+Open VS Code.
+
+Press Ctrl+Shift+P and type Java: Create Java Project.
+
+Select Maven and use the quickstart archetype.
+
+Name your group ID com.lab and artifact ID HibernateProject.
+
+In your src/main/java folder, create a folder named Proj and place the three .java files inside it.
+
+Step 2: Add Dependencies (pom.xml)
+Open your pom.xml and add these dependencies inside the <dependencies> tag:
+
+XML
+<dependency>
+    <groupId>org.hibernate</groupId>
+    <artifactId>hibernate-core</artifactId>
+    <version>5.6.15.Final</version>
+</dependency>
+<dependency>
+    <groupId>mysql</groupId>
+    <artifactId>mysql-connector-java</artifactId>
+    <version>8.0.33</version>
+</dependency>
+Step 3: Configuration (hibernate.cfg.xml)
+Create a file named hibernate.cfg.xml in src/main/resources (or directly in src if not using Maven):
+
+XML
+<!DOCTYPE hibernate-configuration PUBLIC
+"-//Hibernate/Hibernate Configuration DTD 3.0//EN"
+"http://www.hibernate.org/dtd/hibernate-configuration-3.0.dtd">
+<hibernate-configuration>
+    <session-factory>
+        <property name="connection.driver_class">com.mysql.cj.jdbc.Driver</property>
+        <property name="connection.url">jdbc:mysql://localhost:3306/lab_db</property>
+        <property name="connection.username">root</property>
+        <property name="connection.password">yourpassword</property>
+        <property name="dialect">org.hibernate.dialect.MySQL8Dialect</property>
+        <property name="hbm2ddl.auto">update</property>
+        <property name="show_sql">true</property>
+        <mapping class="Proj.Employee"/>
+        <mapping class="Proj.Account"/>
+    </session-factory>
+</hibernate-configuration>
+Note: Create a database named lab_db in your MySQL Workbench before running.
+
+Step 4: Run the Code
+Open Clientruncode.java.
+
+Click the Run button (play icon) at the top right of VS Code.
+
+Check your terminal. You should see Hibernate generating SQL queries and the "Successfully saved" message.
+
+Would you like me to generate the pom.xml file for you to make the library management easier?
