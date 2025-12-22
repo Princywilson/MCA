@@ -1,0 +1,500 @@
+It looks like you're preparing for a Java Enterprise Edition (JEE) lab. Although the exercise description mentions "JavaScript application using Classes and Modules," the code provided is actually a Java WebSocket Application (Back-end) with a HTML/CSS/JS (Front-end).
+
+Below is the complete, aligned code and the setup instructions to get this running on your local machine.
+
+1. Complete Workable Code
+To make this work, you must organize these files into a specific folder structure typical of a Java Web Project (Maven/Gradle style).
+
+Backend (Java)
+File 1: Device.java Location: src/main/java/org/example/model/Device.java
+
+Java
+package org.example.model;
+
+public class Device {
+    private int id;
+    private String name;
+    private String status;
+    private String type;
+    private String description;
+
+    public Device() {
+    }
+
+    public int getId() {
+        return id;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public String getStatus() {
+        return status;
+    }
+
+    public String getType() {
+        return type;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public void setId(int id) {
+        this.id = id;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public void setStatus(String status) {
+        this.status = status;
+    }
+
+    public void setType(String type) {
+        this.type = type;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
+    }
+}
+File 2: DeviceSessionHandler.java Location: src/main/java/org/example/websocket/DeviceSessionHandler.java
+
+Java
+package org.example.websocket;
+
+import java.io.IOException;
+import java.util.ArrayList;
+import javax.enterprise.context.ApplicationScoped;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import javax.json.JsonObject;
+import javax.json.spi.JsonProvider;
+import javax.websocket.Session;
+import org.example.model.Device;
+
+@ApplicationScoped
+public class DeviceSessionHandler {
+    private int deviceId = 0;
+    private final Set<Session> sessions = new HashSet<>();
+    private final Set<Device> devices = new HashSet<>();
+
+    public void addSession(Session session) {
+        sessions.add(session);
+        for (Device device : devices) {
+            JsonObject addMessage = createAddMessage(device);
+            sendToSession(session, addMessage);
+        }
+    }
+
+    public void removeSession(Session session) {
+        sessions.remove(session);
+    }
+
+    public List<Device> getDevices() {
+        return new ArrayList<>(devices);
+    }
+
+    public void addDevice(Device device) {
+        device.setId(deviceId);
+        devices.add(device);
+        deviceId++;
+        JsonObject addMessage = createAddMessage(device);
+        sendToAllConnectedSessions(addMessage);
+    }
+
+    public void removeDevice(int id) {
+        Device device = getDeviceById(id);
+        if (device != null) {
+            devices.remove(device);
+            JsonProvider provider = JsonProvider.provider();
+            JsonObject removeMessage = provider.createObjectBuilder()
+                    .add("action", "remove")
+                    .add("id", id)
+                    .build();
+            sendToAllConnectedSessions(removeMessage);
+        }
+    }
+
+    public void toggleDevice(int id) {
+        JsonProvider provider = JsonProvider.provider();
+        Device device = getDeviceById(id);
+        if (device != null) {
+            if ("On".equals(device.getStatus())) {
+                device.setStatus("Off");
+            } else {
+                device.setStatus("On");
+            }
+            JsonObject updateDevMessage = provider.createObjectBuilder()
+                    .add("action", "toggle")
+                    .add("id", device.getId())
+                    .add("status", device.getStatus())
+                    .build();
+            sendToAllConnectedSessions(updateDevMessage);
+        }
+    }
+
+    private Device getDeviceById(int id) {
+        for (Device device : devices) {
+            if (device.getId() == id) {
+                return device;
+            }
+        }
+        return null;
+    }
+
+    private JsonObject createAddMessage(Device device) {
+        JsonProvider provider = JsonProvider.provider();
+        JsonObject addMessage = provider.createObjectBuilder()
+                .add("action", "add")
+                .add("id", device.getId())
+                .add("name", device.getName())
+                .add("type", device.getType())
+                .add("status", device.getStatus())
+                .add("description", device.getDescription())
+                .build();
+        return addMessage;
+    }
+
+    private void sendToAllConnectedSessions(JsonObject message) {
+        for (Session session : sessions) {
+            sendToSession(session, message);
+        }
+    }
+
+    private void sendToSession(Session session, JsonObject message) {
+        try {
+            session.getBasicRemote().sendText(message.toString());
+        } catch (IOException ex) {
+            sessions.remove(session);
+            Logger.getLogger(DeviceSessionHandler.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }
+}
+File 3: DeviceWebSocketServer.java Location: src/main/java/org/example/websocket/DeviceWebSocketServer.java
+
+Java
+package org.example.websocket;
+
+import javax.enterprise.context.ApplicationScoped;
+import javax.websocket.OnClose;
+import javax.websocket.OnError;
+import javax.websocket.OnMessage;
+import javax.websocket.OnOpen;
+import javax.websocket.Session;
+import javax.websocket.server.ServerEndpoint;
+import javax.inject.Inject;
+import java.io.StringReader;
+import javax.json.Json;
+import javax.json.JsonObject;
+import javax.json.JsonReader;
+import org.example.model.Device;
+import java.util.logging.Logger;
+import java.util.logging.Level;
+
+@ApplicationScoped
+@ServerEndpoint("/actions")
+public class DeviceWebSocketServer {
+
+    @Inject
+    private DeviceSessionHandler sessionHandler;
+
+    @OnOpen
+    public void open(Session session) {
+        sessionHandler.addSession(session);
+    }
+
+    @OnMessage
+    public void handleMessage(String message, Session session) {
+        try (JsonReader reader = Json.createReader(new StringReader(message))) {
+            JsonObject jsonMessage = reader.readObject();
+            if ("add".equals(jsonMessage.getString("action"))) {
+                Device device = new Device();
+                device.setName(jsonMessage.getString("name"));
+                device.setDescription(jsonMessage.getString("description"));
+                device.setType(jsonMessage.getString("type"));
+                device.setStatus("Off");
+                sessionHandler.addDevice(device);
+            }
+            if ("remove".equals(jsonMessage.getString("action"))) {
+                int id = (int) jsonMessage.getInt("id");
+                sessionHandler.removeDevice(id);
+            }
+            if ("toggle".equals(jsonMessage.getString("action"))) {
+                int id = (int) jsonMessage.getInt("id");
+                sessionHandler.toggleDevice(id);
+            }
+        }
+    }
+
+    @OnClose
+    public void close(Session session) {
+        sessionHandler.removeSession(session);
+    }
+
+    @OnError
+    public void onError(Throwable error) {
+        Logger.getLogger(DeviceWebSocketServer.class.getName()).log(Level.SEVERE, null, error);
+    }
+}
+Frontend (Web)
+File 4: index.html Location: src/main/webapp/index.html
+
+HTML
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Java Websocket Home</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="websocket.js"></script>
+    <link rel="stylesheet" type="text/css" href="style.css">
+</head>
+<body>
+    <div id="wrapper">
+        <h1>Java Websocket Home</h1>
+        <p>Welcome to the Java WebSocket Home. Click the Add a device button to start adding devices.</p>
+        <br />
+        <div id="addDevice">
+            <div class="button"><a href="#" OnClick="showForm()">Add a device</a></div>
+            <form id="addDeviceForm">
+                <h3>Add a new device</h3>
+                <span>Name: <input type="text" name="device_name" id="device_name"></span><br>
+                <span>Type:
+                    <select id="device_type">
+                        <option name="type" value="Appliance">Appliance</option>
+                        <option name="type" value="Electronics">Electronics</option>
+                        <option name="type" value="Lights">Lights</option>
+                        <option name="type" value="Other">Other</option>
+                    </select></span><br>
+                <span>Description:<br />
+                    <textarea name="description" id="device_description" rows="2" cols="50"></textarea>
+                </span><br>
+                <input type="button" class="button" value="Add" onclick="formSubmit()">
+                <input type="reset" class="button" value="Cancel" onclick="hideForm()">
+            </form>
+        </div>
+        <br />
+        <h3>Currently connected devices:</h3>
+        <div id="content"></div>
+    </div>
+</body>
+</html>
+File 5: style.css Location: src/main/webapp/style.css
+
+CSS
+body {
+    font-family: Arial, Helvetica, sans-serif;
+    font-size: 80%;
+    background-color: #1f1f1f;
+}
+#wrapper {
+    width: 960px;
+    margin: auto;
+    text-align: left;
+    color: #d9d9d9;
+}
+.button {
+    display: inline;
+    color: #fff;
+    background-color: #f2791d;
+    padding: 8px;
+    margin: auto;
+    border-radius: 8px;
+    border: none;
+}
+.button:hover { background-color: #ffb15e; }
+.button a { color: #fff; text-decoration: none; }
+#addDeviceForm { text-align: left; width: 400px; margin: auto; padding: 10px; }
+#addDeviceForm span { display: block; }
+#content { margin: auto; width: 960px; }
+.device {
+    width: 180px; height: 110px; margin: 10px; padding: 16px;
+    color: #fff; vertical-align: top; border-radius: 8px; display: inline-block;
+}
+.deviceName { text-align: center; font-weight: bold; margin-bottom: 12px; }
+.removeDevice { margin-top: 12px; text-align: center; }
+.device.Appliance { background-color: #5eb85e; }
+.device.Electronics { background-color: #0f90d1; }
+.device.Lights { background-color: #c2a00c; }
+.device.Other { background-color: #db524d; }
+.device a { color: #fff; text-decoration: none; }
+File 6: websocket.js Location: src/main/webapp/websocket.js
+
+JavaScript
+window.onload = init;
+var socket = new WebSocket("ws://localhost:8080/WebsocketHome/actions");
+socket.onmessage = onMessage;
+
+function onMessage(event) {
+    var device = JSON.parse(event.data);
+    if (device.action === "add") {
+        printDeviceElement(device);
+    }
+    if (device.action === "remove") {
+        document.getElementById(device.id).remove();
+    }
+    if (device.action === "toggle") {
+        var node = document.getElementById(device.id);
+        var statusText = node.children[2];
+        if (device.status === "On") {
+            statusText.innerHTML = "<b>Status:</b> " + device.status + " (<a href=\"#\" OnClick=toggleDevice(" + device.id + ")>Turn off</a>)";
+        } else {
+            statusText.innerHTML = "<b>Status:</b> " + device.status + " (<a href=\"#\" OnClick=toggleDevice(" + device.id + ")>Turn on</a>)";
+        }
+    }
+}
+
+function addDevice(name, type, description) {
+    var DeviceAction = { action: "add", name: name, type: type, description: description };
+    socket.send(JSON.stringify(DeviceAction));
+}
+
+function removeDevice(element) {
+    var DeviceAction = { action: "remove", id: element };
+    socket.send(JSON.stringify(DeviceAction));
+}
+
+function toggleDevice(element) {
+    var DeviceAction = { action: "toggle", id: element };
+    socket.send(JSON.stringify(DeviceAction));
+}
+
+function printDeviceElement(device) {
+    var content = document.getElementById("content");
+    var deviceDiv = document.createElement("div");
+    deviceDiv.setAttribute("id", device.id);
+    deviceDiv.setAttribute("class", "device " + device.type);
+    
+    var deviceName = document.createElement("span");
+    deviceName.className = "deviceName";
+    deviceName.innerHTML = device.name;
+    deviceDiv.appendChild(deviceName);
+
+    var deviceType = document.createElement("span");
+    deviceType.innerHTML = "<b>Type:</b> " + device.type;
+    deviceDiv.appendChild(deviceType);
+
+    var deviceStatus = document.createElement("span");
+    if (device.status === "On") {
+        deviceStatus.innerHTML = "<b>Status:</b> " + device.status + " (<a href=\"#\" OnClick=toggleDevice(" + device.id + ")>Turn off</a>)";
+    } else {
+        deviceStatus.innerHTML = "<b>Status:</b> " + device.status + " (<a href=\"#\" OnClick=toggleDevice(" + device.id + ")>Turn on</a>)";
+    }
+    deviceDiv.appendChild(deviceStatus);
+
+    var deviceDescription = document.createElement("span");
+    deviceDescription.innerHTML = "<b>Comments:</b> " + device.description;
+    deviceDiv.appendChild(deviceDescription);
+
+    var removeDevice = document.createElement("span");
+    removeDevice.className = "removeDevice";
+    removeDevice.innerHTML = "<a href=\"#\" OnClick=removeDevice(" + device.id + ")>Remove device</a>";
+    deviceDiv.appendChild(removeDevice);
+    
+    content.appendChild(deviceDiv);
+}
+
+function showForm() { document.getElementById("addDeviceForm").style.display = 'block'; }
+function hideForm() { document.getElementById("addDeviceForm").style.display = "none"; }
+
+function formSubmit() {
+    var form = document.getElementById("addDeviceForm");
+    var name = form.elements["device_name"].value;
+    var type = form.elements["device_type"].value;
+    var description = form.elements["device_description"].value;
+    hideForm();
+    form.reset();
+    addDevice(name, type, description);
+}
+
+function init() { hideForm(); }
+2. Step-by-Step Instructions to Run
+This code requires a Java EE Application Server (like Apache TomEE or GlassFish/Payara) because it uses WebSockets and CDI (@Inject).
+
+Step 1: Prerequisites
+Install JDK 8 or higher.
+
+Install NetBeans IDE or Eclipse IDE for Enterprise Java.
+
+Install a Server (e.g., GlassFish or Apache TomEE).
+
+Step 2: Create the Project
+Open NetBeans.
+
+Go to File > New Project.
+
+Select Java with Maven > Web Application.
+
+Name the project WebsocketHome (The folder name must match the URL in websocket.js).
+
+Step 3: Add Files
+Java Files: Right-click Source Packages, create packages org.example.model and org.example.websocket, and paste the respective Java code provided above.
+
+Web Files: Paste index.html, style.css, and websocket.js inside the Web Pages folder (or src/main/webapp).
+
+Step 4: Configure Dependencies (Maven)
+If using Maven, ensure your pom.xml has dependencies for javax.websocket-api and javax.json-api.
+
+Step 5: Run the Application
+Right-click the project in NetBeans and select Run.
+
+Select your Server (e.g., GlassFish).
+
+The browser should open http://localhost:8080/WebsocketHome/.
+
+Open the browser console (F12) to check if the WebSocket connects successfully.
+
+Would you like me to generate a pom.xml file for you to ensure all the dependencies (like JSON processing and WebSockets) are correctly configured?
+
+is it possible to run this exercise with VS code alone?
+
+Yes, it is entirely possible to run this exercise using VS Code, but because this is a Java Enterprise Edition (EE) application, you need to add a few specific extensions to handle the Java server and build process.
+
+Unlike a simple "Hello World," this code requires a "Web Container" (like Tomcat or GlassFish) to handle the @ServerEndpoint and @Inject annotations.
+
+1. Necessary VS Code Extensions
+Go to the Extensions view (Ctrl+Shift+X) and install:
+
+Extension Pack for Java (by Microsoft) - Includes Language Support, Maven/Gradle, and Debugger.
+
+Community Server Connectors (by Red Hat) - This allows you to run servers like GlassFish or Apache TomEE directly inside VS Code.
+
+2. Setup Instructions for VS Code
+Step 1: Organize your Folder Structure
+VS Code relies on a standard directory structure to recognize Java Web projects. Create your folders like this:
+
+Plaintext
+WebsocketHome/
+├── pom.xml                 <-- (If using Maven)
+├── src/
+│   ├── main/
+│   │   ├── java/
+│   │   │   └── org/example/
+│   │   │       ├── model/Device.java
+│   │   │       └── websocket/DeviceSessionHandler.java, DeviceWebSocketServer.java
+│   │   └── webapp/
+│   │       ├── index.html
+│   │       ├── style.css
+│   │       └── websocket.js
+Step 2: Add a Server
+Download Apache TomEE (Plus or Plume version) or GlassFish and unzip it on your computer.
+
+In VS Code, go to the "Servers" tab (usually at the bottom of the Explorer sidebar).
+
+Click the "+" icon to add a new server.
+
+Point it to the folder where you unzipped TomEE/GlassFish.
+
+Step 3: Build and Deploy
+If using Maven: Run mvn clean package in the VS Code terminal. This creates a .war file in a target folder.
+
+Right-click your project or the .war file and select "Run on Server".
+
+The server will start, and your application will be accessible at http://localhost:8080/WebsocketHome/.
