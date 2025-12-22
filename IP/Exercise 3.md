@@ -1,14 +1,23 @@
 This lab exercise involves setting up a Java Web Application using Gradle. To make this work in VS Code, we need to organize your files into a standard Maven/Gradle directory structure so the compiler can find them.
+
 Below is the aligned code and the setup instructions.
+
 1. The Complete Aligned Code
 Project Structure
 To run this, your VS Code folder must look like this:
- * build.gradle (The configuration file)
- * src/main/java/tutorial/HomeController.java
- * src/main/webapp/WEB-INF/tags/page.tag (This is your first block of code)
- * src/main/webapp/WEB-INF/jsp/home.jsp
+
+build.gradle (The configuration file)
+
+src/main/java/tutorial/HomeController.java
+
+src/main/webapp/WEB-INF/tags/page.tag (This is your first block of code)
+
+src/main/webapp/WEB-INF/jsp/home.jsp
+
 File 1: build.gradle
 Create this in the root folder.
+
+Gradle
 plugins {
     id 'war'
 }
@@ -23,9 +32,10 @@ dependencies {
     implementation 'org.slf4j:slf4j-api:1.7.30'
     implementation 'org.slf4j:slf4j-simple:1.7.30'
 }
-
 File 2: src/main/webapp/WEB-INF/tags/page.tag
 This is the first code block you provided (the template).
+
+Java
 <%@tag description="Default Page template" pageEncoding="UTF-8"%>
 <%@taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
 <%@taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions" %>
@@ -63,9 +73,10 @@ This is the first code block you provided (the template).
 </div>
 </body>
 </html>
-
 File 3: src/main/webapp/WEB-INF/jsp/home.jsp
 This is your Home.jsp block.
+
+Java
 <%@ page session="false"%>
 <%@ page contentType="text/html;charset=UTF-8" pageEncoding="UTF-8" %>
 <%@ taglib prefix="t" tagdir="/WEB-INF/tags" %>
@@ -95,9 +106,10 @@ This is your Home.jsp block.
         </div>
     </jsp:body>
 </t:page>
-
 File 4: src/main/java/tutorial/HomeController.java
 The Servlet Controller.
+
+Java
 package tutorial;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
@@ -113,17 +125,23 @@ public class HomeController extends HttpServlet {
         req.getRequestDispatcher(VIEW_TEMPLATE_PATH).forward(req, resp);
     }
 }
-
 2. Step-by-Step Instructions for VS Code
 Step 1: Install Prerequisites
- * JDK: Ensure you have JDK 8 or 11 installed.
- * VS Code Extensions: Install the "Extension Pack for Java" and "Gradle for Java" from the VS Code Marketplace.
- * Server: Install the "Community Server Connectors" extension to run Tomcat inside VS Code.
+JDK: Ensure you have JDK 8 or 11 installed.
+
+VS Code Extensions: Install the "Extension Pack for Java" and "Gradle for Java" from the VS Code Marketplace.
+
+Server: Install the "Community Server Connectors" extension to run Tomcat inside VS Code.
+
 Step 2: Create the Project Folder
- * Open VS Code and create a new folder for your project.
- * Create the subfolders exactly as shown in the "Project Structure" section above. This is critical for Gradle to build the project.
+Open VS Code and create a new folder for your project.
+
+Create the subfolders exactly as shown in the "Project Structure" section above. This is critical for Gradle to build the project.
+
 Step 3: Add Web Configuration
 Create a file at src/main/webapp/WEB-INF/web.xml to map your Servlet:
+
+XML
 <web-app xmlns="http://xmlns.jcp.org/xml/ns/javaee" version="3.1">
     <servlet>
         <servlet-name>HomeController</servlet-name>
@@ -134,16 +152,24 @@ Create a file at src/main/webapp/WEB-INF/web.xml to map your Servlet:
         <url-pattern>/</url-pattern>
     </servlet-mapping>
 </web-app>
-
 Step 4: Build the Project
- * Open the integrated terminal in VS Code (Ctrl +  `).
- * Type: ./gradlew build (or gradle build if you have it installed globally).
- * This will create a .war file in the build/libs folder.
+Open the integrated terminal in VS Code (Ctrl + `).
+
+Type: ./gradlew build (or gradle build if you have it installed globally).
+
+This will create a .war file in the build/libs folder.
+
 Step 5: Run on Server
- * In VS Code, go to the Servers tab (usually at the bottom left or under the Explorer).
- * Right-click and select Create New Server -> Apache Tomcat.
- * Right-click your Tomcat server and select Add Deployment.
- * Choose the .war file generated in the build/libs folder.
- * Right-click the server and select Start.
- * Open your browser and go to http://localhost:8080/[your-project-name].
+In VS Code, go to the Servers tab (usually at the bottom left or under the Explorer).
+
+Right-click and select Create New Server -> Apache Tomcat.
+
+Right-click your Tomcat server and select Add Deployment.
+
+Choose the .war file generated in the build/libs folder.
+
+Right-click the server and select Start.
+
+Open your browser and go to http://localhost:8080/[your-project-name].
+
 Would you like me to help you create a simple AJAX script to include in the Home.jsp so it fulfills the "consuming RESTful APIs" part of your exercise requirements?
