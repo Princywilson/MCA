@@ -1,5 +1,5 @@
 # This program finds the shortest navigable path through a grid maze from a start point to an end point using 
-the A search algorithm*, considering obstacles and allowing 8-directional movement (including diagonals).
+# the A search algorithm*, considering obstacles and allowing 8-directional movement (including diagonals).
 
 import heapq
 

@@ -1,5 +1,9 @@
+# pip install pandas
+# pip install scikit-learn
+
 import pandas as pd
-df = pd.read_csv('breast−cancer−data.csv')
+df = pd.read_csv('/workspaces/MCA/AI-&-ML/12 SVM/breast−cancer−data.csv')
+# df = pd.read_csv('breast−cancer−data.csv')
 target = df['diagnosis']
 s = set()
 for val in target:
