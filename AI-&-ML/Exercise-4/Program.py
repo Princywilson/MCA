@@ -1,3 +1,4 @@
+# Forward Chaining
 # Keep the inputs in a input.txt file on the same folder
 
 # -*- coding: utf-8 -*-
